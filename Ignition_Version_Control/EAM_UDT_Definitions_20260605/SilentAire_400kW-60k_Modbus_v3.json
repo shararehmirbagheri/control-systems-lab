@@ -1,0 +1,1544 @@
+{
+  "documentation": "QTS SLAB-400kW 60k CFM CRAH UNIT HARDWARE POINTS",
+  "name": "SilentAire_400kW-60k_Modbus_v3",
+  "parameters": {
+    "description": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasSecondary": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String"
+    },
+    "parent": {
+      "dataType": "String",
+      "value": ""
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Float4",
+          "documentation": "System Status\n0, \"Unit Off\",\n1, \"Unit On\",",
+          "enabled": true,
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "System_Status",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36201"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Air_Return_Temp_Low/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Air_Return_Temp_Low",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Air_Return_Temp_Low/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Air_Return_Temp_Alm_Lo_SP"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Air_Return_Temp_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Air_Return_Temp_Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Air_Return_Temp_Hi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Air_Return_Temp_Alm_Hi_SP"
+              }
+            }
+          ],
+          "dataType": "Float4",
+          "documentation": "Return Air Temperature",
+          "enabled": true,
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Air_Return_Temp",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36103@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Supply Air Fan Motor 2 Running Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAF_02_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36209"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Mains Power Status",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{1-hasSecondary}"
+          },
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Preferred_Power_Source_Raw1",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36203"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "CRAC Discharge (Supply) Air Temperature Alarm Low Setpoint",
+          "enabled": true,
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Air_Supply_Temp_Alm_Lo_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_SATemp_LoLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 65.0,
+          "valueSource": "memory"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Fan_Speed/Rollup Active}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Fan_Speed",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Fan_Speed/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Fan_Speed_Alm_Lo_SP"
+              }
+            }
+          ],
+          "dataType": "Float4",
+          "documentation": "Fan Speed",
+          "enabled": true,
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fan_Speed",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36151@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "ATS Source 1 Power Status",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasSecondary}"
+          },
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Preferred_Power_Source_Raw2",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36213"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Supply Air Fan Motor 4 Running Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAF_04_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36211"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Supply Air Fan Motor 5 Running Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAF_05_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36405"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "Return Humidity Alarm High Setpoint",
+          "enabled": true,
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Return_Humidity_Alm_Hi_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300105@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 60,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Supply Filter Differential Pressure",
+          "enabled": true,
+          "engUnit": "\"WC",
+          "historicalDeadband": 0.1,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Supply_Filter_Diff_Press",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36109@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Air_Supply_Temp_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Air_Supply_Temp_Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Air_Supply_Temp_Hi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Air_Supply_Temp_Alm_Hi_SP"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Air_Supply_Temp_Low/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Air_Supply_Temp_Low",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Air_Supply_Temp_Low/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Air_Supply_Temp_Alm_Lo_SP"
+              }
+            }
+          ],
+          "dataType": "Float4",
+          "documentation": "CRAC Discharge (Supply) Air Temperature",
+          "enabled": true,
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Air_Supply_Temp",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36101@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!(tag(\u0027[.]Rollup_\u0027+{TagName}+\u0027/Rollup Changed\u0027)||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "{TagName}",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if(\u0027[.]Rollup_\u0027+{TagName}+\u0027/Rollup Active\u0027||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": 1.0,
+              "timeOffDelaySeconds": 60.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Smoke Detected Alarm",
+          "enabled": true,
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Smoke_Detected",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36204"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Common/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Common_Alarm",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Common/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Common Alarm",
+          "enabled": true,
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Common_Alarm",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36353"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Leak_Detection/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Leak Detected",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Leak_Detection/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Leak Detection Alarm",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Leak_Detection",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36205"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Return Air Temperature Low Setpoint",
+          "enabled": true,
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Air_Return_Temp_Alm_Lo_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_RATemp_LoLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 65.0,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Calculated Air Temp Differential",
+          "enabled": true,
+          "engUnit": "°F",
+          "expression": "abs({[.]Air_Return_Temp}-{[.]Air_Supply_Temp})",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Air_Temp_Diff",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Coil_Diff"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "Return Humidity Alarm Low Setpoint",
+          "enabled": true,
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Return_Humidity_Alm_Lo_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300105@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 20,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Supply Air Fan Motor 3 Running Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAF_03_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36210"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "CRAC Discharge (Supply) Air Temperature Alarm High Setpoint",
+          "enabled": true,
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Air_Supply_Temp_Alm_Hi_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_SATemp_HiLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 78.0,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Cooling Valve Output",
+          "enabled": true,
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Cooling_Valve_Output",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36111@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Return Air Temperature High Setpoint",
+          "enabled": true,
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Air_Return_Temp_Alm_Hi_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_RATemp_HiLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 78.0,
+          "valueSource": "memory"
+        },
+        {
+          "name": "Rollup_Fan_Speed",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "dataType": "Boolean",
+              "executionMode": "FixedRate",
+              "executionRate": 500,
+              "expression": "hasChanged({[.]Rollup Active})",
+              "name": "Rollup Changed",
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Boolean",
+              "expression": "{[.]Parents/Parent1}||{[.]Parents/Parent2}||{[.]Parents/Parent3}||{[.]Parents/Parent4}||{[.]Parents/Parent5}||{[.]Parents/Parent6}",
+              "name": "Rollup Active",
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "name": "parentPaths",
+              "tagType": "Folder",
+              "tags": [
+                {
+                  "dataType": "String",
+                  "expression": "null",
+                  "name": "Parent4",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{Parent Alarm 1}"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "String",
+                  "expression": "replace({PathToParentFolder},\"/Alarms/Rollup/Fan_Speed/parentPaths\",\"/data/Unit_Status\")",
+                  "name": "Parent1",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{Parent Alarm 1}"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "String",
+                  "expression": "null",
+                  "name": "Parent6",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{Parent Alarm 1}"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "String",
+                  "expression": "null",
+                  "name": "Parent2",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{Parent Alarm 1}"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "String",
+                  "expression": "null",
+                  "name": "Parent5",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{Parent Alarm 1}"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "String",
+                  "expression": "null",
+                  "name": "Parent3",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{Parent Alarm 1}"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                }
+              ]
+            },
+            {
+              "name": "Parents",
+              "tagType": "Folder",
+              "tags": [
+                {
+                  "dataType": "Boolean",
+                  "expression": "if(isNull({[.]../parentPaths/Parent4}),false,tag({[.]../parentPaths/Parent4}))",
+                  "name": "Parent4",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{[.]../../Parents/Parent1}/lossOfPower"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "Boolean",
+                  "expression": "if(isNull({[.]../parentPaths/Parent6}),false,tag({[.]../parentPaths/Parent6}))",
+                  "name": "Parent6",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{[.]../../Parents/Parent1}/lossOfPower"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "Boolean",
+                  "expression": "if(isNull({[.]../parentPaths/Parent2}),false,tag({[.]../parentPaths/Parent2}))",
+                  "name": "Parent2",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{[.]../../Parents/Parent1}/lossOfPower"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "Boolean",
+                  "expression": "if(isNull({[.]../parentPaths/Parent3}),false,tag({[.]../parentPaths/Parent3}))",
+                  "name": "Parent3",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{[.]../../Parents/Parent1}/lossOfPower"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "Boolean",
+                  "expression": "if(isNull({[.]../parentPaths/Parent1}),false,if(isBad(tag({[.]../parentPaths/Parent1})),false,!tag({[.]../parentPaths/Parent1})))",
+                  "name": "Parent1",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{[.]../../Parents/Parent1}/lossOfPower"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                },
+                {
+                  "dataType": "Boolean",
+                  "expression": "if(isNull({[.]../parentPaths/Parent5}),false,tag({[.]../parentPaths/Parent5}))",
+                  "name": "Parent5",
+                  "sourceTagPath": {
+                    "bindType": "parameter",
+                    "binding": "{[.]../../Parents/Parent1}/lossOfPower"
+                  },
+                  "tagType": "AtomicTag",
+                  "valueSource": "expr"
+                }
+              ]
+            }
+          ],
+          "typeId": "Admin/Rollup"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Return_Humidity_Low/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Return_Humidity_Low",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Return_Humidity_Low/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Return_Humidity_Alm_Lo_SP"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Return_Humidity_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Return_Humidity_Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Return_Humidity_Hi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": {
+                "bindType": "Tag",
+                "value": "[.]Return_Humidity_Alm_Hi_SP"
+              }
+            }
+          ],
+          "dataType": "Float4",
+          "documentation": "Return Humidity",
+          "enabled": true,
+          "engUnit": "%RH",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Return_Humidity",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36107@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "name": "Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ],
+          "typeId": "Admin/Bad_Data"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "Fan Speed Alarm Low Setpoint",
+          "enabled": true,
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Fan_Speed_Alm_Lo_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300105@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "value": 10,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Supply Air Fan Motor 6 Running Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAF_06_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36407"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Supply Air Fan Motor 1 Running Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAF_01_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.36208"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!(tag(\u0027[.]Rollup_\u0027+\u0027Preferred Power Fail\u0027+\u0027/Rollup Changed\u0027)||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Preferred Power Fail",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if(tag(\u0027[.]Rollup_\u0027+\u0027Preferred Power Fail\u0027+\u0027/Rollup Active\u0027)||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 0.0,
+              "timeOffDelaySeconds": 60.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Preferred Power Fail",
+          "enabled": true,
+          "engUnit": "",
+          "expression": "If({hasSecondary}\u003d0,{[.]Preferred_Power_Source_Raw1},{[.]Preferred_Power_Source_Raw2})",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 15,
+          "historyMaxAgeUnits": "MIN",
+          "historyProvider": "cnpg",
+          "name": "Preferred_Power_Source",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Alm_MainPowerLoss"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "documentation": "System Operating State \n0, \"Unit Off\"\n1, \"Unit On\"",
+          "enabled": true,
+          "expression": "Case({[.]System_Status},\r\n0, \"Unit Off\",\r\n1, \"Unit On\",\r\n\"Unknown\"\r\n)",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "System_Operating_State",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.35117@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Maintenance"
+    },
+    {
+      "dataType": "DateTime",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "name": "version",
+      "tagType": "AtomicTag",
+      "value": 1771965481197,
+      "valueSource": "memory"
+    },
+    {
+      "name": "Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "High",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Diagnostic",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Critical",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Low",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Medium",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "ActiveOrUnack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}",
+              "name": "Active",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "Unack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Alarm_Summary"
+    },
+    {
+      "name": "TopStat",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/TopStat"
+    },
+    {
+      "name": "Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Meta"
+    }
+  ],
+  "typeId": ""
+}

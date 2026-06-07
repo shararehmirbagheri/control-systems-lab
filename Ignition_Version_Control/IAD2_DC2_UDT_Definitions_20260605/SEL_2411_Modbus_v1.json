@@ -1,0 +1,1433 @@
+{
+  "documentation": "",
+  "name": "SEL_2411_Modbus_v1",
+  "typeId": "",
+  "parameters": {
+    "parent": {
+      "dataType": "String",
+      "value": ""
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String",
+      "value": ""
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Alarms",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "name": "Rollup",
+          "tagType": "Folder"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF({[.]../Data/Way3_Pos}\u003d0,1,\r\nIF({[.]../Data/Way3_Pos}\u003d2 \u0026\u0026 {[.]../Data/Way3_Normal_State}\u003d1,1,\r\nIF({[.]../Data/Way3_Pos}\u003d1 \u0026\u0026 {[.]../Data/Way3_Normal_State}\u003d2,1,\r\n0)))",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way3_Pos_Alm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "deadbandMode": "Absolute",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way3_Pos_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way3_Pos_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Way3_Pos_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF({[.]../Data/Way2_Pos}\u003d0,1,\r\nIF({[.]../Data/Way2_Pos}\u003d2 \u0026\u0026 {[.]../Data/Way2_Normal_State}\u003d1,1,\r\nIF({[.]../Data/Way2_Pos}\u003d1 \u0026\u0026 {[.]../Data/Way2_Normal_State}\u003d2,1,\r\n0)))",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way2_Pos_Alm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "deadbandMode": "Absolute",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way2_Pos_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way2_Pos_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Way2_Pos_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF({[.]../Data/Way4_Pos}\u003d0,1,\r\nIF({[.]../Data/Way4_Pos}\u003d2 \u0026\u0026 {[.]../Data/Way4_Normal_State}\u003d1,1,\r\nIF({[.]../Data/Way4_Pos}\u003d1 \u0026\u0026 {[.]../Data/Way4_Normal_State}\u003d2,1,\r\n0)))",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way4_Pos_Alm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "deadbandMode": "Absolute",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way4_Pos_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way4_Pos_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Way4_Pos_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF({[.]../Data/Way5_Pos}\u003d0,1,\r\nIF({[.]../Data/Way5_Pos}\u003d2 \u0026\u0026 {[.]../Data/Way5_Normal_State}\u003d1,1,\r\nIF({[.]../Data/Way5_Pos}\u003d1 \u0026\u0026 {[.]../Data/Way5_Normal_State}\u003d2,1,\r\n0)))",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way5_Pos_Alm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "deadbandMode": "Absolute",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way5_Pos_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way5_Pos_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Way5_Pos_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF({[.]../Data/Way1_Pos}\u003d0,1,\r\nIF({[.]../Data/Way1_Pos}\u003d2 \u0026\u0026 {[.]../Data/Way1_Normal_State}\u003d1,1,\r\nIF({[.]../Data/Way1_Pos}\u003d1 \u0026\u0026 {[.]../Data/Way1_Normal_State}\u003d2,1,\r\n0)))",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way1_Pos_Alm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "deadbandMode": "Absolute",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way1_Pos_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way1_Pos_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Way1_Pos_Alm",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "TopStat",
+      "typeId": "Admin/TopStat",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "valueSource": "expr",
+          "expression": "CASE(\r\n{[.]Way4_Pos},\r\n0, \"Position is Unknown\",\r\n1, \"Position is Open\",\r\n2, \"Position is Closed\",\r\n\"Position is Unknown\")",
+          "dataType": "String",
+          "documentation": "Way4 Switch Status",
+          "name": "Way4_Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300550.2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way4_Bkr_Sts}\u003d1,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way4 Switch Closed",
+          "name": "Way4_Closed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.3"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "AE_Reduction_Mode",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/AE_Reduction_Mode/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/AE_Reduction_Mode/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 in Arc Energy Reduction Mode",
+          "name": "Way4_Arc_Reduction_Mode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300551.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way5_Bkr_Sts}\u003d1,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way5 Switch Closed",
+          "name": "Way5_Closed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "documentation": "Way3 Switch Normal State",
+          "name": "Way3_Normal_State",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF(isGood({[.]Way3_Closed}) \u0026\u0026 isGood({[.]Way3_Open}),\r\nIF({[.]Way3_Closed}\u003d0 \u0026\u0026 {[.]Way3_Open}\u003d1,1,\r\nIF({[.]Way3_Closed}\u003d1 \u0026\u0026 {[.]Way3_Open}\u003d0,2,\r\n0)),0)",
+          "documentation": "Way3 Switch Position",
+          "name": "Way3_Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "CASE(\r\n{[.]Way5_Pos},\r\n0, \"Position is Unknown\",\r\n1, \"Position is Open\",\r\n2, \"Position is Closed\",\r\n\"Position is Unknown\")",
+          "dataType": "String",
+          "documentation": "Way5 Switch Status",
+          "name": "Way5_Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF(isGood({[.]Way5_Closed}) \u0026\u0026 isGood({[.]Way5_Open}),\r\nIF({[.]Way5_Closed}\u003d0 \u0026\u0026 {[.]Way5_Open}\u003d1,1,\r\nIF({[.]Way5_Closed}\u003d1 \u0026\u0026 {[.]Way5_Open}\u003d0,2,\r\n0)),0)",
+          "documentation": "Way5 Switch Position",
+          "name": "Way5_Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF(isGood({[.]Way6_Closed}) \u0026\u0026 isGood({[.]Way6_Open}),\r\nIF({[.]Way6_Closed}\u003d0 \u0026\u0026 {[.]Way6_Open}\u003d1,1,\r\nIF({[.]Way6_Closed}\u003d1 \u0026\u0026 {[.]Way6_Open}\u003d0,2,\r\n0)),0)",
+          "documentation": "Way6 Switch Position",
+          "name": "Way6_Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF(isGood({[.]Way4_Closed}) \u0026\u0026 isGood({[.]Way4_Open}),\r\nIF({[.]Way4_Closed}\u003d0 \u0026\u0026 {[.]Way4_Open}\u003d1,1,\r\nIF({[.]Way4_Closed}\u003d1 \u0026\u0026 {[.]Way4_Open}\u003d0,2,\r\n0)),0)",
+          "documentation": "Way4 Switch Position",
+          "name": "Way4_Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300549.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way1_Bkr_Sts}\u003d1,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way1 Switch Closed",
+          "name": "Way1_Closed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300551.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way6_Bkr_Sts}\u003d1,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way6 Switch Closed",
+          "name": "Way6_Closed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "documentation": "Way6 Switch Normal State",
+          "name": "Way6_Normal_State",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.4"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "documentation": "Way5 Breaker Status",
+          "name": "Way5_Bkr_Sts",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "CASE(\r\n{[.]Way6_Pos},\r\n0, \"Position is Unknown\",\r\n1, \"Position is Open\",\r\n2, \"Position is Closed\",\r\n\"Position is Unknown\")",
+          "dataType": "String",
+          "documentation": "Way6 Switch Status",
+          "name": "Way6_Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF(isGood({[.]Way2_Closed}) \u0026\u0026 isGood({[.]Way2_Open}),\r\nIF({[.]Way2_Closed}\u003d0 \u0026\u0026 {[.]Way2_Open}\u003d1,1,\r\nIF({[.]Way2_Closed}\u003d1 \u0026\u0026 {[.]Way2_Open}\u003d0,2,\r\n0)),0)",
+          "documentation": "Way2 Switch Position",
+          "name": "Way2_Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "AE_Reduction_Mode",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/AE_Reduction_Mode/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/AE_Reduction_Mode/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 in Arc Energy Reduction Mode",
+          "name": "Way5_Arc_Reduction_Mode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300551.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way5_Bkr_Sts}\u003d0,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way5 Switch Open",
+          "name": "Way5_Open",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.0"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "documentation": "Way1 Breaker Status",
+          "name": "Way1_Bkr_Sts",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300550.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way3_Bkr_Sts}\u003d1,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way3 Switch Closed",
+          "name": "Way3_Closed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300549.2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way2_Bkr_Sts}\u003d1,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way2 Switch Closed",
+          "name": "Way2_Closed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "AE_Reduction_Mode",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/AE_Reduction_Mode/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/AE_Reduction_Mode/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 in Arc Energy Reduction Mode",
+          "name": "Way2_Arc_Reduction_Mode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "IF(isGood({[.]Way1_Closed}) \u0026\u0026 isGood({[.]Way1_Open}),\r\nIF({[.]Way1_Closed}\u003d0 \u0026\u0026 {[.]Way1_Open}\u003d1,1,\r\nIF({[.]Way1_Closed}\u003d1 \u0026\u0026 {[.]Way1_Open}\u003d0,2,\r\n0)),0)",
+          "documentation": "Way1 Switch Position",
+          "name": "Way1_Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "AE_Reduction_Mode",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/AE_Reduction_Mode/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/AE_Reduction_Mode/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 in Arc Energy Reduction Mode",
+          "name": "Way1_Arc_Reduction_Mode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.4"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way2_Tripped",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way2_Tripped/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way2_Tripped/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way2 Switch Tripped",
+          "name": "Way2_Tripped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300549.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way1_Bkr_Sts}\u003d0,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way1 Switch Open",
+          "name": "Way1_Open",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300550.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way3_Bkr_Sts}\u003d0,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way3 Switch Open",
+          "name": "Way3_Open",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300551.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way6_Bkr_Sts}\u003d0,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way6 Switch Open",
+          "name": "Way6_Open",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way5_Tripped",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way5_Tripped/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way5_Tripped/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way5 Switch Tripped",
+          "name": "Way5_Tripped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.3"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "documentation": "Way2 Breaker Status",
+          "name": "Way2_Bkr_Sts",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "documentation": "Way2 Switch Normal State",
+          "name": "Way2_Normal_State",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "documentation": "Way5 Switch Normal State",
+          "name": "Way5_Normal_State",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300550.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way4_Bkr_Sts}\u003d0,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way5 Switch Open",
+          "name": "Way4_Open",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.7"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "documentation": "Way6 Breaker Status",
+          "name": "Way6_Bkr_Sts",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300549.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "if({[.]Way2_Bkr_Sts}\u003d0,1,0)",
+          "dataType": "Boolean",
+          "documentation": "Way2 Switch Open",
+          "name": "Way2_Open",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "documentation": "Way4 Breaker Status",
+          "name": "Way4_Bkr_Sts",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "CASE(\r\n{[.]Way1_Pos},\r\n0, \"Position is Unknown\",\r\n1, \"Position is Open\",\r\n2, \"Position is Closed\",\r\n\"Position is Unknown\")",
+          "dataType": "String",
+          "documentation": "Way1 Switch Status",
+          "name": "Way1_Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "documentation": "Way4 Switch Normal State",
+          "name": "Way4_Normal_State",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way4_Tripped",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way4_Tripped/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way4_Tripped/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way4 Switch Tripped",
+          "name": "Way4_Tripped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "documentation": "Way3 Breaker Status",
+          "name": "Way3_Bkr_Sts",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way1_Tripped",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way1_Tripped/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way1_Tripped/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 Switch Tripped",
+          "name": "Way1_Tripped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41051.0"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "AE_Reduction_Mode",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/AE_Reduction_Mode/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/AE_Reduction_Mode/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 in Arc Energy Reduction Mode",
+          "name": "Way3_Arc_Reduction_Mode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "documentation": "Way1 Switch Normal State",
+          "name": "Way1_Normal_State",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "CASE(\r\n{[.]Way2_Pos},\r\n0, \"Position is Unknown\",\r\n1, \"Position is Open\",\r\n2, \"Position is Closed\",\r\n\"Position is Unknown\")",
+          "dataType": "String",
+          "documentation": "Way2 Switch Status",
+          "name": "Way2_Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41052.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "AE_Reduction_Mode",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/AE_Reduction_Mode/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/AE_Reduction_Mode/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way1 in Arc Energy Reduction Mode",
+          "name": "Way6_Arc_Reduction_Mode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "CASE(\r\n{[.]Way3_Pos},\r\n0, \"Position is Unknown\",\r\n1, \"Position is Open\",\r\n2, \"Position is Closed\",\r\n\"Position is Unknown\")",
+          "dataType": "String",
+          "documentation": "Way3 Switch Status",
+          "name": "Way3_Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41050.7"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way3_Tripped",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way3_Tripped/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way3_Tripped/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way3 Switch Tripped",
+          "name": "Way3_Tripped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.41052.0"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "mode": "Equality",
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Way6_Tripped",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Way6_Tripped/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Way6_Tripped/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "Way6 Switch Tripped",
+          "name": "Way6_Tripped",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}

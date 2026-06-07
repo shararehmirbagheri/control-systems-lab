@@ -1,0 +1,576 @@
+{
+  "name": "XFMR_PM7650_Model1_v3",
+  "typeId": "",
+  "parameters": {
+    "meterName": {
+      "dataType": "Integer"
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "TopStat",
+      "typeId": "Admin/TopStat_TH",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.XFMR_xPY_LoOilAlm.Sts_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S5\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_Trip_Alarm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_Trip/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_Trip/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S5",
+          "name": "XFMR_Trip_Alarm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.XFMR_xPY_LoOilAlm.Sts_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S7\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_PRD",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_PRD/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_PRD/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S7",
+          "name": "XFMR_PRD",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent_PM}_{suffix}.{device_PM}.400004@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S4\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_Alm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S4",
+          "name": "XFMR_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.XFMR_xPY_LoOilAlm.Sts_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S1\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_Low_Oil_Alarm",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_Low_Oil/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_Low_Oil/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S1",
+          "name": "XFMR_Low_Oil_Alarm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.XFMR_xPY_LoOilAlm.Sts_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S3\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_Aux_Contact",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_Aux_Contact/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_Aux_Contact/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S3",
+          "name": "XFMR_Aux_Contact",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.XFMR_xPY_LoOilAlm.Sts_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S6\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_PGV",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_PGV/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_PGV/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S6",
+          "name": "XFMR_PGV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.XFMR_xPY_LoOilAlm.Sts_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "expression": "tag(\r\nsplit({RootInstanceName},\u0027_\u0027)[len(split({RootInstanceName},\u0027_\u0027))-2,0]\r\n+\u0027/Electrical/Meter/\u0027+{meterName}+\u0027/DI_S2\u0027\r\n)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "XFMR_Fan_Running",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_XFMR_Fan_Running/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_XFMR_Fan_Running/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "documentation": "DI_S2",
+          "name": "XFMR_Fan_Running",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "DateTime",
+      "name": "version",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "value": 1762377206000,
+      "tagType": "AtomicTag"
+    }
+  ]
+}

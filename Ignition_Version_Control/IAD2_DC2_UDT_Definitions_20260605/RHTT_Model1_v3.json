@@ -1,0 +1,2076 @@
+{
+  "name": "RHTT_Model1_v3",
+  "typeId": "",
+  "parameters": {
+    "hasAlarms": {
+      "dataType": "Integer",
+      "value": 1
+    },
+    "parentMI": {
+      "dataType": "String"
+    },
+    "deviceMI": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "plcNameTI": {
+      "dataType": "String"
+    },
+    "suffixMI": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "parentTI": {
+      "dataType": "String",
+      "value": ""
+    },
+    "deviceTI": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "plcNameMI": {
+      "dataType": "String"
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffixTI": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_LoDevLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Lo_Dev_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasLoAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_Lo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasLoDevAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_Lo_Dev_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiRoCLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Hi_RoC_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_Fail"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Fail",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_LoLoLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_LoLo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiHiDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_HiHi_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasFailAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_Fail_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_Lo"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Lo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_Lo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_LoDevDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Lo_Dev_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Hi_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiHiLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_HiHi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_LoLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Lo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_HiRoC"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Hi_RoC",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Hi_RoC/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Hi_RoC/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_Hi_RoC",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_Hi"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Hi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_Hi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Hi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_LoDevLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Lo_Dev_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_LoDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Lo_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiDevDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Hi_Dev_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiHiDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_HiHi_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_LoDevDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Lo_Dev_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_PVEUMin@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_PVEU_Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasHiAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_Hi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_Hihi"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Hihi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Hihi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Hihi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_HiHi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_LoLoLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_LoLo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_HiDev"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Hi_Dev",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Hi_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Hi_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_Hi_Dev",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_PVEUMax@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_PVEU_Max",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasHiHiAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_HiHi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasFailAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_Fail_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_LoLoDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_LoLo_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasHiAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_Hi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_PVEUMin@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_PVEU_Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiRoCLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Hi_RoC_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasLoDevAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_Lo_Dev_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiHiLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_HiHi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historicalDeadband": 0.5,
+          "name": "TI_PV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historicalDeadband": 0.5,
+          "name": "MI_PV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_LoDev"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Lo_Dev",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Lo_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Lo_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_Lo_Dev",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_LoLo"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_LoLo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_LoLo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_Fail"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Fail",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiDevDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Hi_Dev_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_Hi"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Hi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_Hi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_LoLoDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_LoLo_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasLoAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_Lo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_Ref@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Ref",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_PVEUMax@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_PVEU_Max",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_LoDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Lo_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasHiRoCAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_Hi_RoC_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_HiDev"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Hi_Dev",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_Hi_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Hi_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_Hi_Dev",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasLoLoAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_LoLo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiDevLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Hi_Dev_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasLoLoAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_LoLo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasHiRoCAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_Hi_RoC_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiDevLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Hi_Dev_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasHiHiAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_HiHi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_Hihi"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Hihi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Am_MI_Hihi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Hihi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_HiHi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.DateTime_Current.Sec"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "HB_TI",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HasHiDevAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_MI_Has_Hi_Dev_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Alm_Lo"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_TI_Lo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_TI_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_TI_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_TI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_TI_Lo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_Ref@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Ref",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_HiLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Hi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_LoLo"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_LoLo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_LoLo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "1-(({[.]Cfg_TI_HiHi_Lim}-{[.]TI_PV})/({[.]Cfg_TI_HiHi_Lim}-{[.]Cfg_TI_LoLo_Lim}))",
+          "dataType": "Float4",
+          "name": "displayRatio",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Cfg_LoLim@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_MI_Lo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_HiRoC"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Hi_RoC",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_Hi_RoC/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Hi_RoC/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_Hi_RoC",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HiDB@FLOAT"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Cfg_TI_Hi_DB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentTI}_{suffixTI}.{plcNameTI}.{deviceTI}.Cfg_HasHiDevAlm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Cfg_TI_Has_Hi_Dev_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.DateTime_Current.Sec"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "HB_MI",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentMI}_{suffixMI}.{plcNameMI}.{deviceMI}.Alm_LoDev"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAlarms}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Alm_MI_Lo_Dev",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp_Alm_MI_Lo_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp_Alm_MI_Lo_Dev/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat_MI/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Alm_MI_Lo_Dev",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "DateTime",
+      "name": "version",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "value": 1762447194000,
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "TopStat_MI",
+      "typeId": "Admin/TopStat_AB",
+      "parameters": {
+        "parent": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{parentMI}"
+          }
+        },
+        "plcName": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{plcNameMI}"
+          }
+        },
+        "suffix": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{suffixMI}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "TopStat_TI",
+      "typeId": "Admin/TopStat_AB",
+      "parameters": {
+        "parent": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{parentTI}"
+          }
+        },
+        "plcName": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{plcNameTI}"
+          }
+        },
+        "suffix": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{suffixTI}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}

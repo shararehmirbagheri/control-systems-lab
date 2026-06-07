@@ -1,0 +1,1562 @@
+{
+  "name": "Liebert_610SCC-Sitelink_Modbus_v3",
+  "parameters": {
+    "description": {
+      "dataType": "String"
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String"
+    },
+    "parent": {
+      "dataType": "String"
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "unitID": {
+      "dataType": "Integer",
+      "value": 1
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "dataType": "DateTime",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "name": "version",
+      "tagType": "AtomicTag",
+      "value": 1779810011878,
+      "valueSource": "memory"
+    },
+    {
+      "name": "Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Alarm_Summary"
+    },
+    {
+      "name": "Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Maintenance"
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Input_Volts_CA",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39979+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Comm_Error/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "Comm_Error",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Comm_Error/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": true,
+          "expression": "IF(isGood({[.]UPS_Output_Source}) \u0026\u0026 {[.]UPS_Output_Source}\u003d4,1,0)",
+          "name": "Comm_Error",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40284+unitID*5}.0@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "Hz",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Bypass_Freq",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39996+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Bypass_Not_Available/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "Bypass_Not_Available",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Bypass_Not_Available/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": true,
+          "expression": "IF(isGood({[.]UPS_Output_Source}) \u0026\u0026 {[.]UPS_Output_Source}\u003d4,1,0)",
+          "name": "Bypass_Not_Available",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40285+unitID*5}.7@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Bypass_Volts_CA",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39994+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Volts_BC",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39981+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "enabled": true,
+          "engUnit": "V",
+          "name": "Nominal_Voltage",
+          "tagType": "AtomicTag",
+          "value": 480,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "Hz",
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Freq",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39995+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Input_Volts_BC",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39978+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Volts_AB",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39980+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Internal_Comm_Failure/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "Internal_Comm_Failure",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Internal_Comm_Failure/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": true,
+          "expression": "IF(isGood({[.]UPS_Output_Source}) \u0026\u0026 {[.]UPS_Output_Source}\u003d4,1,0)",
+          "name": "Internal_Comm_Failure",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40285+unitID*5}.0@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "kVA",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_kVA",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39986+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "enabled": true,
+          "engUnit": "A",
+          "name": "Input_Amp_Rating",
+          "tagType": "AtomicTag",
+          "value": 120,
+          "valueSource": "memory"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_EPO_Shutdown/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "EPO_Shutdown",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_EPO_Shutdown/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": true,
+          "expression": "IF(isGood({[.]UPS_Output_Source}) \u0026\u0026 {[.]UPS_Output_Source}\u003d4,1,0)",
+          "name": "EPO_Shutdown",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40284+unitID*5}.8@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Bypass_Breaker_Open/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "Bypass_Breaker_Open",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Bypass_Breaker_Open/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": true,
+          "expression": "IF(isGood({[.]UPS_Output_Source}) \u0026\u0026 {[.]UPS_Output_Source}\u003d4,1,0)",
+          "name": "Bypass_Breaker_Closed",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40284+unitID*5}.4@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "name": "Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ],
+          "typeId": "Admin/Bad_Data"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "A",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Amps_A",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39983+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_On/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "On_Bypass",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_On/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": true,
+          "expression": "IF(isGood({[.]UPS_Output_Source}) \u0026\u0026 {[.]UPS_Output_Source}\u003d4,1,0)",
+          "name": "On_Bypass",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40284+unitID*5}.9@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Output Percent Load Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": 99.0
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Output Percent Load Lo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": -1.0
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "displayPath": "",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Output Percent Load LoLo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": -2.0
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}\r\n"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Output Percent Load HiHi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": 100.0
+            }
+          ],
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "%",
+          "expression": "(max({[.]Output_Amps_A},{[.]Output_Amps_B},{[.]Output_Amps_C})/{[.]Output_Amp_Rating})*100",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 24,
+          "historyMaxAgeUnits": "HOUR",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Percent_Load",
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "enabled": true,
+          "engUnit": "Volts",
+          "name": "Bypass_Amp_Rating",
+          "tagType": "AtomicTag",
+          "value": 1600,
+          "valueSource": "memory"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Output_Volts_LL_Avg_LoLo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Nominal_Voltage}*0.90"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Output_Volts_LL_Avg_HiHi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Nominal_Voltage}*1.10"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Output_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Output_Volts_LL_Avg_Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Output_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Nominal_Voltage}*1.05"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Output_Volts_LL_Avg_Lo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Nominal_Voltage}*0.95"
+              }
+            }
+          ],
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "expression": "({[.]Output_Volts_AB}+{[.]Output_Volts_BC}+{[.]Output_Volts_CA})/3",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "HOUR",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Volts_LL_Avg",
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "enabled": true,
+          "engUnit": "Volts",
+          "name": "Output_Amp_Rating",
+          "tagType": "AtomicTag",
+          "value": 120,
+          "valueSource": "memory"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Output_Breaker_Open/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\u0027 \u0027+{name}"
+              },
+              "name": "Output_Breaker_Open",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Output_Breaker_Open/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "name": "Output_Breaker_Open",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{40284+unitID*5}.5@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "engUnit": "V",
+          "name": "Input_Nominal_Voltage",
+          "tagType": "AtomicTag",
+          "value": 480,
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "A",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Amps_B",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39984+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!{[.]Rollup_Bypass_Volts_LL_Avg_HiHi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Error}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Bypass_Volts_LL_Avg_HiHi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Bypass_Volts_LL_Avg_HiHi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*1.10"
+              },
+              "timeOffDelaySeconds": 30.0
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!{[.]Rollup_Bypass_Volts_LL_Avg_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Error}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Bypass_Volts_LL_Avg_LoLo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Bypass_Volts_LL_Avg_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*0.9"
+              },
+              "timeOffDelaySeconds": 30.0
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!{[.]Rollup_Bypass_Volts_LL_Avg_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Error}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Bypass_Volts_LL_Avg_Lo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Bypass_Volts_LL_Avg_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*0.95"
+              },
+              "timeOffDelaySeconds": 30.0
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!{[.]Rollup_Bypass_Volts_LL_Avg_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Error}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Bypass_Volts_LL_Avg_Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Bypass_Volts_LL_Avg_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*1.05"
+              },
+              "timeOffDelaySeconds": 30.0
+            }
+          ],
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "expression": "({[.]Bypass_Volts_AB}+{[.]Bypass_Volts_BC}+{[.]Bypass_Volts_CA})/3",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "HOUR",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Bypass_Volts_LL_Avg",
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Bypass_Volts_AB",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39992+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Input_Volts_LL_Avg_LoLo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*0.90"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Input_Volts_LL_Avg_Hi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*1.05"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "Input_Volts_LL_Avg_HiHi",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*1.10"
+              }
+            },
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "BelowValue",
+              "name": "Input_Volts_LL_Avg_Lo",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Input_Volts_LL_Avg/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "setpointA": {
+                "bindType": "Expression",
+                "value": "{[.]Input_Nominal_Voltage}*0.95"
+              }
+            }
+          ],
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "expression": "({[.]Input_Volts_AB}+{[.]Input_Volts_BC}+{[.]Input_Volts_CA})/3",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "HOUR",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Input_Volts_LL_Avg",
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "kW",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_kW",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39987+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "A",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Amps_C",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39985+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Volts_CA",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39982+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Input_Volts_AB",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39977+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": true,
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Bypass_Volts_BC",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.{39993+unitID*24}@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Meta"
+    },
+    {
+      "name": "TopStat",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/TopStat"
+    }
+  ],
+  "typeId": ""
+}

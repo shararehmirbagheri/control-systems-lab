@@ -1,0 +1,3727 @@
+{
+  "documentation": "Uses CompPID instead of SuctPressPID for PIC points;\nChanged Parent to PLCName on LeadLag folder tags",
+  "name": "AHU_POD_Model2_v3",
+  "typeId": "",
+  "parameters": {
+    "parent": {
+      "dataType": "String",
+      "value": ""
+    },
+    "AHU_Num_ILck": {
+      "dataType": "String"
+    },
+    "AHU_Num": {
+      "dataType": "String",
+      "value": ""
+    },
+    "plcName": {
+      "dataType": "String"
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String",
+      "value": ""
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tbase_path \u003d \u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\tsystem.tag.writeBlocking([base_path + \u0027/Parameters.AHU_Num_ILck\u0027], [currentValue])"
+        }
+      ],
+      "expression": "if({AHU_Num}\u003d\u00271\u0027,\u0027\u0027,{AHU_Num})",
+      "dataType": "String",
+      "name": "AHU_Num_ILck",
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref_Cfg_Prio[2]"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_Cfg_Prio_2",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.Sts_PVBad"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Filter_Sts_PVBad",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_xxxxx/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_xxxxx/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Filter_Sts_PVBad",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_PGain"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_PGain",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[5].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_6_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.OCmd_Casc"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Sts_Casc",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_SFEn.Sts_Out@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "SFEn_Sts_Out",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HasHiHiDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Has_HiHi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HasHiDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_Has_Hi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_7_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_7/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_7/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_7_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HiDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_Hi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_PVEUMin"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_PVEU_Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HiHiDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_HiHi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_3_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_3/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_3/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_3_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.OCmd_Auto"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Sts_Auto",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.Sts_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Filter_Sts_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_LoLoDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_LoLo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.Alm_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_Alm_TgtDisagree",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.MCmd_InpPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "AFS_MCmd_Inp_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_SFEn.Sts_Prog@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "SFEn_Sts_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[2].Sts_Stopped"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_2_Sts_Stopped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.MCmd_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "AFS_MCmd_Subst_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Sts_PVBad"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "AFS_Sts_PV_Bad",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_AFS_Sts_PV_Bad/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_AFS_Sts_PV_Bad/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "AFS_Sts_PV_Bad",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[2].Val_Rank"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_2_Val_Rank",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HasLoLoDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_Has_LoLo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Alm_HiHiDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "MIC_Alm_HiHi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_MIC_Alm_HiHi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_MIC_Alm_HiHi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "MIC_Alm_HiHi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.Sts_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Filter_Sts_PV_Sts_Subst_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[2].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_3_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_BypActive"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "Sts_BypActive_Ilck",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Cfg_HasTgtDisagreeAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "AFS_Cfg_Has_Tgt_Disagree_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Alm_LoLoDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "PIC_Alm_LoLo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_PIC_Alm_LoLo/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_PIC_Alm_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "PIC_Alm_LoLo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.CmdSrc.OCmd_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Sts_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.4"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_5_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_5/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_5/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_5_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_PVEUMax"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_PVEU_Max",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_SFEn_Runtime.Val_CurRunHrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_Fan_Runtime",
+          "engUnit": "Hrs",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[3].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_4_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HiHiDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_HiHi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.MCmd_SubstPV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_MCmd_SubstPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_CVRoCLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Hi_Ro_C_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.6"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_7",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_7_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_7/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_7/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_7",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HasLoDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Has_Lo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_IntlkOK"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 0.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Nrdy_Intlk",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Nrdy_Intlk/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Nrdy_Intlk/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Nrdy_Intlk",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.MSet_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Filter_MSet_Subst_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[0].Val_Rank"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_0_Val_Rank",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HiDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Hi_Dev_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_DGain"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_DGain",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.3"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_4",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_4_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_4/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_4/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_4",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_LoDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Lo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.MSet_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_MSet_SubstPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.Cfg_HasTgtDisagreeAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Filter_Cfg_Has_Tgt_Disagree_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_SetTrack"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Set_Track",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.MCmd_InpPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Filter_MCmd_Inp_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[{AHU_Num-1}].Val_Rank"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "AHU_xPY_Ref_x_Val_Rank",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_MinSP"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_Min_SP",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HasHiDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Has_Hi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HiDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Hi_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Alm_Fail"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "PIC_Alm_Fail",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_PIC_Alm_Fail/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_PIC_Alm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "PIC_Alm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_FanSP1@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "FanSP1",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.OSet_SP"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "MIC_Val_SP",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_CVEUMin"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_CVEU_Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.Sts_PVBad"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Comp_Sts_PV_Bad",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_xxxxx/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_xxxxx/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Comp_Sts_PV_Bad",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HasFailAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_Has_Fail_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HasCasc"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_Has_Casc",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.OCmd_Man"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Sts_Man",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.MCmd_InpPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_MCmd_Inp_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.0"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_1",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_1_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_1/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_1/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_1",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.OSet_CV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "MIC_Val_CV_Out",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Alm_HiDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "PIC_Alm_Hi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_PIC_Alm_Hi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_PIC_Alm_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "PIC_Alm_Hi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_FanSP_PSet_CV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyTimeDeadband": 10,
+          "historyMaxAge": 900000,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "FanSP_PSet_CV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.Cfg_HasTgtDisagreeAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_Cfg_HasTgtDisagreeAlm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Sts_SubstPV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_Sts_PVSts_SubstPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.OCmd_Auto"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Sts_Auto",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.CmdSrc.OCmd_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Sts_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Sts_PV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_Sts_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_2",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_2_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_2/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_2/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_2",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[{AHU_Num-1}].Sts_Stopped"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "AHU_xPY_Ref_x_Sts_Stopped",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.Cfg_TgtDisagreeOnDly"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Filter_Cfg_Tgt_Disagree_On_Dly",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_SFEn.Sts_Ext@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "SFEn_Sts_Ext",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_IGain"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_IGain",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Alm_HiHiDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "PIC_Alm_HiHi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_PIC_Alm_HiHi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_PIC_Alm_HiHi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "PIC_Alm_HiHi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompEn.Sts_Oper@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "CompEn_Sts_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_SFEn.Sts_Oper@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "SFEn_Sts_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HasCasc"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Has_Casc",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.Sts_SubstPV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_Sts_PVSts_SubstPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_CVEUMax"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_CVEU_Max",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Alm_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "AFS_Alm_Tgt_Disagree",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_xxxxx/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_xxxxx/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "AFS_Alm_Tgt_Disagree",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Cfg_TgtDisagreeOnDly"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AFS_Cfg_Tgt_Disagree_On_Dly",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_DGain"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_DGain",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[1].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_2_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HasLoDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_Has_Lo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[3].Sts_Stopped"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_3_Sts_Stopped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[0].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_1_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[6].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_7_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_CVRoCLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_Hi_Ro_C_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_FanSP.Val_CVOut@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Float4",
+          "name": "FanSP_Val_CVOut",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_PVEUMax"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_PVEU_Max",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.MCmd_SubstPV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_MCmd_SubstPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[1].Sts_Stopped"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_1_Sts_Stopped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_MaxSP"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Max_SP",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Alm_LoDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "MIC_Alm_Lo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_MIC_Alm_Lo/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_MIC_Alm_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "MIC_Alm_Lo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref_Cfg_Prio[1]"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_Cfg_Prio_1",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_001_SuctPress.Val@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "SuctPress",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.MCmd_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Filter_MCmd_Subst_PV",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Filter_MCmd_Subst_PV/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Filter_MCmd_Subst_PV/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Filter_MCmd_Subst_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_PVEUMin"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_PVEU_Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.4"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_5",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_5_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_5/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_5/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_5",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompEn.Sts_Out@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "CompEn_Sts_Out",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.Cfg_TgtDisagreeOnDly@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Comp_Cfg_TgtDisagreeOnDly",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_SATemp.Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "TT_SA_PV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.Sts_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_Sts_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Cfg_CondTxt[4].DATA/20"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "String",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "ILck_In1_5_Desc",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.CmdSrc.OCmd_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Sts_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompEn.Sts_Ext@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "CompEn_Sts_Ext",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.MCmd_InpPV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_MCmd_InpPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Alm_LoLoDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "MIC_Alm_LoLo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_MIC_Alm_LoLo/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_MIC_Alm_LoLo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "MIC_Alm_LoLo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.MSet_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "AFS_MSet_Subst_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_CVEUMax"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_CVEU_Max",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Cfg_TgtDisagreeOnDly"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Fan_Cfg_Tgt_Disagree_On_Dly",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_IGain"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_IGain",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_MinSP"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Min_SP",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref_Cfg_Prio[3]"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_Cfg_Prio_3",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_PGain"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_PGain",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.OSet_SP"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyTimeDeadband": 10,
+          "historyMaxAge": 900000,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "PIC_Val_SP",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[3].Val_Rank"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_3_Val_Rank",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DirtyFltr.Alm_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Filter_Alm_Tgt_Disagree",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Filter_Alm_Tgt_Disagree/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Filter_Alm_Tgt_Disagree/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Filter_Alm_Tgt_Disagree",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumEn.Sts_Out"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "AHU_xPY_DehumEn",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HasFailAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Has_Fail_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompEn_Runtime.Val_CurRunHrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_Comp_Runtime",
+          "engUnit": "Hrs",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HasHiHiDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_Has_HiHi_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Sts_PVBad@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_Sts_PVBad",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Alm_LoDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "PIC_Alm_Lo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_PIC_Alm_Lo/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_PIC_Alm_Lo/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "PIC_Alm_Lo",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_CVEUMin"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_CVEU_Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_LoLoDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_LoLo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref_Cfg_Prio[0]"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_Cfg_Prio_0",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_FanSP2@Float"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "FanSP2",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_2_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_2/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_2/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_2_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_SetTrack"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "PIC_Cfg_Set_Track",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompSts.MSet_SubstPV@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Comp_MSet_SubstPV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Alm_Fail"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "MIC_Alm_Fail",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_MIC_Alm_Fail/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_MIC_Alm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "MIC_Alm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Alm_TgtDisagree@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "{TagName}",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_xxxxx/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_xxxxx/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Fan_Alm_TgtDisagree",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_3",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_3_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_3/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_3/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_3",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Cfg_HasTgtDisagreeAlm@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Fan_Cfg_HasTgtDisagreeAlm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[0].Sts_Stopped"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_0_Sts_Stopped",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.3"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_4_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_4/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_4/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_4_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_Ref[1].Val_Rank"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "AHU_xPY_Ref_1_Val_Rank",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.CmdSrc.OCmd_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Sts_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Val_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "PIC_Val_PV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.Sts_Intlk.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_6",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]ILck_In1_6_Desc}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_6/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_6/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_6",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_LoDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_Lo_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_HasLoLoDevAlm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Cfg_Has_LoLo_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompEn.Sts_Prog@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "CompEn_Sts_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_RATemp.Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "historyTimeDeadband": 10,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "TT_RA_PV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Sts_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "AFS_Sts_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.5"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_6_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_6/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_6/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_6_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.OCmd_Man"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "MIC_Sts_Man",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Out_CV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyTimeDeadband": 10,
+          "historyMaxAge": 900000,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "PIC_Val_CV_Out",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "%",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Alm_HiDev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "MIC_Alm_Hi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_MIC_Alm_Hi/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_MIC_Alm_Hi/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "MIC_Alm_Hi",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Val_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyTimeDeadband": 10,
+          "historyMaxAge": 900000,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "name": "MIC_Val_PV",
+          "historyEnabled": true,
+          "sampleMode": "OnChange",
+          "engUnit": "°F",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_DehumPID.Cfg_MaxSP"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "MIC_Cfg_Max_SP",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_AFSw.Sts_SubstPV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "AFS_Sts_PV_Sts_Subst_PV",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_AHU_Intlk{AHU_Num_ILck}.mset_bypass.0"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 900000,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MS",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "ILck_In1_1_Bypass",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_ILck_In1_1/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_ILck_In1_1/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "ILck_In1_1_Bypass",
+          "historyEnabled": false,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.Cfg_HiHiDevLim"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Cfg_HiHi_Dev_Lim",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.AHU_xPY_00{AHU_Num}_CompPID.OCmd_Casc"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "PIC_Sts_Casc",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "TopStat",
+      "typeId": "Admin/TopStat_TH",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "DateTime",
+      "name": "version",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "value": 1762377206000,
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "opcItemPath": {
+        "bindType": "parameter",
+        "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.CLX_DateTime.Sec@Short"
+      },
+      "opcServer": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      },
+      "valueSource": "opc",
+      "dataType": "Float4",
+      "name": "HB",
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tbase_path \u003d \u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\tsystem.tag.writeBlocking([base_path + \u0027/Parameters.AHU_Num\u0027], [currentValue])"
+        }
+      ],
+      "expression": "right(TAG({PathToParentFolder}+\"/Parameters.TagName\"),2)",
+      "dataType": "Int4",
+      "name": "AHU_Num",
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}

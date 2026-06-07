@@ -1,0 +1,1656 @@
+{
+  "documentation": "Use for LeadLag that controls pairs (2) of CRAHs or CHLRs. \"motors\" param needs to say CRAH or CHLR short name, not not just numbers. ",
+  "name": "LeadLag_Pairs_Model2_v3",
+  "typeId": "",
+  "parameters": {
+    "parent": {
+      "dataType": "String"
+    },
+    "hasDemandLineup": {
+      "dataType": "String",
+      "value": "1"
+    },
+    "description": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "motors": {
+      "dataType": "String"
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasRotateCountdown": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "plcName": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{parent}"
+      }
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasAutoRotate": {
+      "dataType": "String",
+      "value": "1"
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "opcServer": {
+      "dataType": "String"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_DNMTD"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasDemandLineup}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "DemandLineupTimeDelay",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Val_Sts"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historyTimeDeadband": 10,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Val_Sts",
+          "historyEnabled": true,
+          "sampleMode": "OnChange"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATION_DAY"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Rotation_Day",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Sts_Oper",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_Oper/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_Oper/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Sts_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATION_HR"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Rotation_Hour",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_DNM"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasDemandLineup}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Int4",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "The Number of Running Motors is less than Demanded ",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Demand_Lineup_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Demand_Lineup_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Demand_Lineup_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATE_HRS"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Rotate_SP",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_AllowRotate"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "Cfg_AllowRotate",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_Err"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Error Status",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_Err/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_Err/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Sts_Err",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_RotateOnStop"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "Cfg_RotateOnStop",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATE_REQ_DENY"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Int4",
+          "name": "Rotation_Deny",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.CmdSrc.MCmd_IS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "MCmd_IS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Motor_02",
+          "typeId": "Admin/LL_Motor_v3",
+          "parameters": {
+            "parent": {
+              "dataType": "Integer",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{parent}"
+              }
+            },
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 1
+            },
+            "plcName": {
+              "dataType": "String",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{plcName}"
+              }
+            },
+            "suffix": {
+              "dataType": "Integer",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{suffix}"
+              }
+            },
+            "device": {
+              "dataType": "Integer",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{device}"
+              }
+            },
+            "opcServer": {
+              "dataType": "String",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              }
+            }
+          },
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Cfg_Prio"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Int4",
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Stopping"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Stopped"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Starting"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Running"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_MotorAvail.{motorNum}"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.MSet_MotorOoS.{motorNum}"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Int4",
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Val_rank"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Int4",
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.CmdSrc.OCmd_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "valueSource": "expr",
+              "expression": "runScript(\"shared.summarys.isGood\",5000,replace({PathToParentFolder},\"/Data/\"+{InstanceName},\"\"))",
+              "dataType": "Boolean",
+              "alarms": [
+                {
+                  "setpointA": 1.0,
+                  "ackPipeline": "Alarms/Ack Alerts",
+                  "activePipeline": "Alarms/Critical Alerts",
+                  "timeOnDelaySeconds": 30.0,
+                  "name": "Bad Data",
+                  "clearPipeline": "Alarms/Critical Alerts",
+                  "externalNotify": "True",
+                  "CustomEmailMessage": {
+                    "bindType": "Expression",
+                    "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+split({fullItemPath},\"/\")[4,0]+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+                  },
+                  "CustomEmailSubject": {
+                    "bindType": "Expression",
+                    "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\nsplit({fullItemPath},\"/\")[4,0]"
+                  },
+                  "label": {
+                    "bindType": "Expression",
+                    "value": "split({fullItemPath},\"/\")[4,0]+\" \"+{name}"
+                  },
+                  "priority": {
+                    "bindType": "Expression",
+                    "value": "if({[.]Rollup_Bad_Data/Rollup Active}||{[.]../../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+                  },
+                  "enabled": {
+                    "bindType": "Expression",
+                    "value": "!({[.]Rollup_Bad_Data/Rollup Changed}||{[.]../../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../../TopStat/Comm_Fail}"
+                  }
+                }
+              ],
+              "executionMode": "FixedRate",
+              "executionRate": 5000,
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATE_REQ_CONF"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Int4",
+          "name": "Rotation_Conf",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_Ovrd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_Ovrd",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.OCmd_Rotate"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Rotate",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_StartDelay"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Cfg_StartDelay",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.OCmd_Reset"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Reset",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATE_REQ_HMI"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historyTimeDeadband": 10,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Rotation_Req",
+          "historyEnabled": true,
+          "sampleMode": "OnChange"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.ORdy_Rotate"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "ORdy_Rotate",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_NotRdy"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_NotRdy",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.DateTime_Current.Sec"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "HB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Nrdy_Perm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Nrdy_Perm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Motor_01",
+          "typeId": "Admin/LL_Motor_v3",
+          "parameters": {
+            "parent": {
+              "dataType": "Integer",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{parent}"
+              }
+            },
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 0
+            },
+            "plcName": {
+              "dataType": "String",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{plcName}"
+              }
+            },
+            "suffix": {
+              "dataType": "Integer",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{suffix}"
+              }
+            },
+            "device": {
+              "dataType": "Integer",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{device}"
+              }
+            },
+            "opcServer": {
+              "dataType": "String",
+              "value": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              }
+            }
+          },
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Stopping"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Val_rank"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Int4",
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.MSet_MotorOoS.{motorNum}"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Int4",
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Running"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_MotorAvail.{motorNum}"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Cfg_Prio"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Int4",
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Stopped"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "opcItemPath": {
+                "bindType": "parameter",
+                "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_Motors[{motorNum}].Sts_Starting"
+              },
+              "opcServer": {
+                "bindType": "parameter",
+                "binding": "{opcServer}"
+              },
+              "valueSource": "opc",
+              "scaleMode": "Off",
+              "readOnly": false,
+              "dataType": "Boolean",
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.OSet_Demand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historyTimeDeadband": 10,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "OSet_Demand",
+          "historyEnabled": true,
+          "sampleMode": "OnChange"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_OoS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_OoS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Nrdy_Intlk"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Nrdy_Intlk",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Sts_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.CmdSrc.MCmd_OoS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "MCmd_OoS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_StopDelay"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Cfg_StopDelay",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.CmdSrc.OCmd_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Val_Demand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historyTimeDeadband": 10,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Val_Demand",
+          "historyEnabled": true,
+          "sampleMode": "OnChange"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_MinDemand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historyTimeDeadband": 10,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Cfg_MinDemand",
+          "historyEnabled": true,
+          "sampleMode": "OnChange"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_ROTATE_HMI_SP"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasRotateCountdown}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Int4",
+          "name": "Rotate_Countdown",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "readOnly": false,
+      "dataType": "Int4",
+      "writePermissions": {
+        "type": "AllOf",
+        "securityLevels": []
+      },
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "readPermissions": {
+        "type": "AllOf",
+        "securityLevels": []
+      },
+      "tagGroup": "Default",
+      "enabled": true,
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "eventScripts": [
+            {
+              "eventid": "valueChanged",
+              "script": "\tproviderName \u003d tagPath[tagPath.find(\"[\")+1:tagPath.find(\"]\")]\n\tif providerName !\u003d currentValue.value:\n\t\tsystem.tag.writeBlocking(\"[.]TagProvider\", providerName)"
+            }
+          ],
+          "valueSource": "memory",
+          "dataType": "String",
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "runScript(\u0027shared.summarys.getUDTInstances\u0027,0,{[.]TagProvider}, left({PathToParentFolder},lastIndexOf({PathToTag},\"Alarm_Summary\")))",
+          "readOnly": true,
+          "dataType": "Document",
+          "executionMode": "FixedRate",
+          "executionRate": 1000,
+          "tagGroup": "Default",
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "jsonGet({[.]Summary}, \u0027hasUnackAlarm\u0027)",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "jsonGet({[.]Summary}, \u0027class\u0027)",
+          "readOnly": true,
+          "dataType": "String",
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "valueSource": "expr",
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}",
+              "readOnly": true,
+              "name": "Active",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "readOnly": true,
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "readOnly": true,
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "valueSource": "expr",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "readOnly": true,
+              "dataType": "Int4",
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "valueSource": "expr",
+          "expression": "jsonGet({[.]Summary}, \u0027priority\u0027)",
+          "readOnly": true,
+          "dataType": "String",
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "jsonGet({[.]Summary}, \u0027priorityUnack\u0027)",
+          "readOnly": true,
+          "dataType": "String",
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "jsonGet({[.]Summary}, \u0027state\u0027)",
+          "readOnly": true,
+          "dataType": "String",
+          "name": "State",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "valueSource": "memory",
+      "dataType": "DateTime",
+      "name": "version",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "value": 1769196438362,
+      "tagType": "AtomicTag"
+    },
+    {
+      "name": "TopStat",
+      "typeId": "Admin/TopStat_TH",
+      "parameters": {
+        "parent": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{parent}"
+          }
+        },
+        "suffix": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{suffix}"
+          }
+        },
+        "device": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{device}"
+          }
+        },
+        "opcServer": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._Statistics._FailedReads"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._Statistics._SuccessfulReads"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Float4",
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._System._Enabled"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._System._Error"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "timeOnDelaySeconds": 60.0,
+              "name": "Comm_Fail",
+              "timeOffDelaySeconds": 300.0,
+              "externalNotify": "True",
+              "displayPath": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../Data/RollUp_Comm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../Data/RollUp_Comm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              }
+            }
+          ],
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._System._DeviceId"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "dataType": "String",
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "parameters": {
+        "Description": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{description}"
+          }
+        },
+        "Location": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{location}"
+          }
+        },
+        "Floor": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{floor}"
+          }
+        },
+        "Room": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{room}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "value": {
+            "bindType": "parameter",
+            "binding": "{Floor}"
+          },
+          "valueSource": "memory",
+          "dataType": "String",
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "if({Description}\u003d\"\",split({RootInstanceName},\"_\")[2,0],{Description})",
+          "dataType": "String",
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "split({PathToParentFolder},\"/\")[0,0]",
+          "dataType": "String",
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": {
+            "bindType": "parameter",
+            "binding": "{Room}"
+          },
+          "valueSource": "memory",
+          "dataType": "String",
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "split({RootInstanceName},\"_\")[0,0]+\"_\"+split({RootInstanceName},\"_\")[1,0]",
+          "dataType": "String",
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "value": {
+            "bindType": "parameter",
+            "binding": "{Location}"
+          },
+          "valueSource": "memory",
+          "dataType": "String",
+          "name": "Location",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "Boolean",
+          "writePermissions": {
+            "type": "AllOf",
+            "securityLevels": [
+              {
+                "name": "Authenticated",
+                "children": []
+              }
+            ]
+          },
+          "readPermissions": {
+            "type": "AllOf",
+            "securityLevels": []
+          },
+          "value": false,
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "hasChanged({[.]MaintenanceMode})",
+          "dataType": "Boolean",
+          "executionMode": "FixedRate",
+          "executionRate": 500,
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "dataType": "String",
+          "writePermissions": {
+            "type": "AllOf",
+            "securityLevels": [
+              {
+                "name": "Authenticated",
+                "children": []
+              }
+            ]
+          },
+          "value": "No Note Set",
+          "name": "Note",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}

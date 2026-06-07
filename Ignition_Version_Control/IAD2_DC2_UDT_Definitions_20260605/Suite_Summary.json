@@ -1,0 +1,233 @@
+{
+  "name": "Suite_Summary",
+  "parameters": {
+    "Has_Electrical": {
+      "dataType": "String",
+      "value": ""
+    },
+    "Has_Cooling": {
+      "dataType": "String",
+      "value": ""
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.suiteTotalTons\",10000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "dataType": "Float4",
+      "name": "Total_Tonnage",
+      "tagGroup": "Expression10",
+      "engUnit": "Tons",
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.getLocation\")",
+      "dataType": "String",
+      "name": "Location",
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.suiteItLoad\",1000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "historicalDeadband": 1.0,
+      "tagGroup": "Expression10",
+      "engUnit": "kW",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "IT_Load",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "#\tif not initialChange:\n\t\tif currentValue.value:\n\t\t\tsystem.tag.writeAsync([\"[.]./Parameters.Has_Cooling\"],[True])\t\n\t\telse:\n\t\t\tsystem.tag.writeAsync([\"[.]./Parameters.Has_Cooling\"],[False])"
+        }
+      ],
+      "expression": "if({Has_Cooling}\u003d\"\",false,try({[.]../Cooling}\u003e0,false))",
+      "dataType": "Boolean",
+      "name": "Has_Cooling",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "enabled": true,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "{[.]Total_Load}/{[.]IT_Load}",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "PUE",
+      "historyEnabled": true,
+      "sampleMode": "TagGroup",
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "#\tif not initialChange:\n\t\tif currentValue.value:\n\t\t\tsystem.tag.writeAsync([\"[.]./Parameters.Has_Electrical\"],[True])\n\t\telse:\n\t\t\tsystem.tag.writeAsync([\"[.]./Parameters.Has_Electrical\"],[False])"
+        }
+      ],
+      "expression": "if({Has_Electrical}\u003d\"\",false,try({[.]../Electrical}\u003e0,false))",
+      "dataType": "Boolean",
+      "name": "Has_Electrical",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "enabled": true,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.suiteChillers\",10000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "name": "Chiller_Count",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "tag(replace({PathToParentFolder},\"/Suite_Summary\",\"\")+\"/Electrical/Meter/\"+{[.]Location}+\"_SWD_\"+replace({PathToParentFolder},\"/Suite_Summary\",\"\")+\"_PM1/data/kW\")",
+      "historicalDeadband": 1.0,
+      "tagGroup": "Expression10",
+      "engUnit": "kW",
+      "tagType": "AtomicTag",
+      "dataType": "String",
+      "historyProvider": "cnpg",
+      "name": "Total_Load",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.suiteFlowTotal\",10000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "engUnit": "GPM",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Flow_Total",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.suiteRelHum\",1000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "engUnit": "%",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Rel_Humidity",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.suiteAvgTemp\",1000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "engUnit": "°F",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Avg_Temp",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.suiteActiveChillers\",1000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Active_Chillers",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.suiteAvgTemp_Secondary\",1000,replace({PathToParentFolder},\"/Suite_Summary\",\"\"))",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "engUnit": "°F",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Avg_Temp_Secondary",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    }
+  ]
+}

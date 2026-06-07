@@ -1,0 +1,2047 @@
+{
+  "name": "CRAH_Manager_AI-LCS_v3",
+  "parameters": {
+    "description": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String"
+    },
+    "parent": {
+      "dataType": "String",
+      "value": ""
+    },
+    "plcName": {
+      "dataType": "String"
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "roomID": {
+      "dataType": "String"
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "TopStat",
+      "parameters": {
+        "device": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{device}"
+          }
+        },
+        "opcServer": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          }
+        },
+        "parent": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{parent}"
+          }
+        },
+        "suffix": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{suffix}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "dataType": "Float4",
+          "name": "Successful Reads",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._Statistics._SuccessfulReads"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "name": "Enabled",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._System._Enabled"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "name": "Hostname",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._System._DeviceId"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "name": "Failed Reads",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._Statistics._FailedReads"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "displayPath": {
+                "bindType": "Expression",
+                "value": "{device}+\" \"+{name}"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../Data/RollUp_Comm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "name": "Comm_Fail",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../Data/RollUp_Comm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0,
+              "timeOffDelaySeconds": 300.0,
+              "timeOnDelaySeconds": 60.0
+            }
+          ],
+          "dataType": "Boolean",
+          "name": "Comm_Fail",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}._System._Error"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        }
+      ],
+      "typeId": "Admin/TopStat_TH"
+    },
+    {
+      "name": "Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Meta"
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_08_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_08"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_04_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_04"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_12_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_12"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_12_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_12"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_01_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_01"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_13_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_13"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_11_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_11"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int8",
+          "engUnit": "Cnt",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "To_AICS_HB",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_TO_AICS_HB@Long"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "expression": "case({[.]Agent_Sts_Raw},\r\n1,\"Learn\",\r\n2,\"Optimize\",\r\n\"Off\")",
+          "name": "Agent_Sts",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "name": "Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ],
+          "typeId": "Admin/Bad_Data"
+        },
+        {
+          "dataType": "Boolean",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "OCmd_LCS_SP_Mode",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_Mode_Cmd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_12_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_12"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_07_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_07"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_06_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_06"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_08_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_08"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_13_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_13"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_03_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_03"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "expression": "case({[.]LCS_SP_Mode_Raw},\r\n1,\"AI\",\r\n2,\"Local\",\r\n3,\"Trans to AI\",\r\n4,\"Trans to LCS\",\r\n\"Unknown\")",
+          "name": "LCS_SP_Mode",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_09_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_09"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_10_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_10"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_04_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_04"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_03_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_03"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_09_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_09"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_07_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_07"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_06_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_06"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_02_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_02"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "OCmd_Spd_Ovr",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SPD_OVR_CMD"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_06_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_06"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_12_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_12"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int8",
+          "engUnit": "Cnt",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "To_LCS_HB",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_TO_LCS_HB@Long"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_11_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_11"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_03_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_03"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "LCS_SP_Mode_Raw",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_MODE@Long"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_10_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_10"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_05_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_05"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_05_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_05"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_10_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_10"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_04_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_04"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "Sec",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_TMP_UPD_TM",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_TMP_UPD_TM"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "AICS_Sts_Raw",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_AICS_Status"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_Spd_Override",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SPD_Override"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_03_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_03"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_13_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_13"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_06_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_06"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_09_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_09"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_08_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_08"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_11_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_11"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Agent_Sts_Raw",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_AI_Agent_Status@Long"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_08_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_08"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int8",
+          "engUnit": "Cnt",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "To_LCS_HB_Echo",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_TO_LCS_HB_Echo@Long"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_05_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_05"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_02_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_02"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_05_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_05"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_01_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_01"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_09_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_09"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_04_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_04"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_10_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_10"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_DPT_07_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_DPT_07"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_01_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_01"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "expression": "case({[.]AICS_Sts_Raw},\r\n1,\"Ok\",\r\n2,\"Conn Loss\",\r\n3,\"AI Constrained\",\r\n4,\"Internal Error\",\r\n\"Unknown\")",
+          "name": "AICS_Sts",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_LCS_SAT_02_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_LCS_SP_SAT_02"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int8",
+          "engUnit": "Cnt",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "To_AICS_HB_Echo",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_TO_AICS_HB_Echo@Long"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_13_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_13"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "\"wc",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "DPT_11_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_DPT_11"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "Sec",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Cfg_AI_TMP_UPD_TM",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_AI_TMP_UPD_TM"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": false,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_02_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_02"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_07_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_07"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "engUnit": "°F",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "SAT_01_SP",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}_SP_SAT_01"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "rawLow": 0.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "scaledHigh": 10.0,
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        }
+      ]
+    },
+    {
+      "name": "Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}",
+              "name": "Active",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "Unack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "ActiveOrUnack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "High",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Medium",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Diagnostic",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Low",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Critical",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Alarm_Summary"
+    },
+    {
+      "dataType": "DateTime",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "name": "version",
+      "tagType": "AtomicTag",
+      "value": 1777325625588,
+      "valueSource": "memory"
+    },
+    {
+      "name": "Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Maintenance"
+    }
+  ],
+  "typeId": ""
+}

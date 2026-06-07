@@ -1,0 +1,137 @@
+{
+  "name": "TopStat_v2",
+  "parameters": {
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{device}"
+      }
+    },
+    "opcPath": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{opcPath}"
+      }
+    },
+    "opcPathDevice": {
+      "dataType": "String"
+    },
+    "opcServer": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      }
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "dataType": "String",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tbase_path \u003d \u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\tsystem.tag.writeBlocking([base_path + \u0027/Parameters.opcPathDevice\u0027], [currentValue])"
+        }
+      ],
+      "expression": "subString({opcPath}, 0, lastIndexOf({opcPath}, \".\"))",
+      "name": "opcPathDevice",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Float4",
+      "name": "Failed Reads",
+      "opcItemPath": {
+        "bindType": "parameter",
+        "binding": "nsu\u003dTOP Server;s\u003d{opcPathDevice}._Statistics._FailedReads"
+      },
+      "opcServer": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      },
+      "tagType": "AtomicTag",
+      "valueSource": "opc"
+    },
+    {
+      "alarms": [
+        {
+          "displayPath": {
+            "bindType": "Expression",
+            "value": "{device}+\" \"+{name}"
+          },
+          "enabled": {
+            "bindType": "Expression",
+            "value": "!({[.]../Data/RollUp_Comm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+          },
+          "externalNotify": "True",
+          "name": "Comm_Fail",
+          "priority": {
+            "bindType": "Expression",
+            "value": "if({[.]../Data/RollUp_Comm_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+          },
+          "setpointA": 1.0,
+          "timeOffDelaySeconds": 300.0,
+          "timeOnDelaySeconds": 60.0
+        }
+      ],
+      "dataType": "Boolean",
+      "name": "Comm_Fail",
+      "opcItemPath": {
+        "bindType": "parameter",
+        "binding": "nsu\u003dTOP Server;s\u003d{opcPathDevice}._System._Error"
+      },
+      "opcServer": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      },
+      "tagType": "AtomicTag",
+      "valueSource": "opc"
+    },
+    {
+      "dataType": "String",
+      "name": "Hostname",
+      "opcItemPath": {
+        "bindType": "parameter",
+        "binding": "nsu\u003dTOP Server;s\u003d{opcPathDevice}._System._DeviceId"
+      },
+      "opcServer": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      },
+      "tagType": "AtomicTag",
+      "valueSource": "opc"
+    },
+    {
+      "dataType": "Boolean",
+      "name": "Enabled",
+      "opcItemPath": {
+        "bindType": "parameter",
+        "binding": "nsu\u003dTOP Server;s\u003d{opcPathDevice}._System._Enabled"
+      },
+      "opcServer": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      },
+      "tagType": "AtomicTag",
+      "valueSource": "opc"
+    },
+    {
+      "dataType": "Float4",
+      "name": "Successful Reads",
+      "opcItemPath": {
+        "bindType": "parameter",
+        "binding": "nsu\u003dTOP Server;s\u003d{opcPathDevice}._Statistics._SuccessfulReads"
+      },
+      "opcServer": {
+        "bindType": "parameter",
+        "binding": "{opcServer}"
+      },
+      "tagType": "AtomicTag",
+      "valueSource": "opc"
+    }
+  ],
+  "typeId": ""
+}

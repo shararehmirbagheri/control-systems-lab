@@ -1,0 +1,2517 @@
+{
+  "name": "LeadLag_Model2_v1",
+  "typeId": "",
+  "parameters": {
+    "parent": {
+      "dataType": "String"
+    },
+    "hasDemandLineup": {
+      "dataType": "String",
+      "value": "1"
+    },
+    "hasRATTDAlm": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "motors": {
+      "dataType": "String"
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasTimers": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasEmerTimer": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasRotateCountdown": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasAutoRotate": {
+      "dataType": "String",
+      "value": "1"
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "opcServer": {
+      "dataType": "String"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Alarms",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_TD_Alarm"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasRATTDAlm}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "RAT SP Changing by more than 5 degrees",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/RAT_TD_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/RAT_TD_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "RAT_TD_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_DNM"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasDemandLineup}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "The Number of Running Motors is less than Demanded ",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Demand_Lineup_Alm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Demand_Lineup_Alm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Demand_Lineup_Alm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Rollup",
+          "tagType": "Folder"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "TopStat",
+      "typeId": "Admin/TopStat_TH",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_StartDelay"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Cfg_StartDelay",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.ORdy_Rotate"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "ORdy_Rotate",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.OCmd_Rotate"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Rotate",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Sts_Ovrd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_Ovrd",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Sts_OoS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_OoS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATE_REQ_DENY"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "Rotation_Deny",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATION_DAY"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Rotation_Day",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.OSet_Demand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "OSet_Demand",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_StopDelay"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Cfg_StopDelay",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Nrdy_Perm"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Nrdy_Perm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Sts_NotRdy"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_NotRdy",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Sts_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Val_Sts"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Val_Sts",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Nrdy_Intlk"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Nrdy_Intlk",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATE_HRS"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Rotate_SP",
+          "engUnit": "Hrs",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.MSet_MotorOoS@DWORD"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Float4",
+          "name": "MSet_MotorOoS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_STGUP_TMR.ACC"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasTimers}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "StgUp_Dly_Tmr",
+          "engUnit": "Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_AllowRotate"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "Cfg_AllowRotate",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Sts_Err"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "name": "Error Status",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../Alarms/Rollup/Sts_Err/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../Alarms/RollUp/Sts_Err/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "Sts_Err",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATE_REQ_HMI"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Rotation_Req",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_STGDN_TMR.ACC"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasTimers}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "StgDn_Dly_Tmr",
+          "engUnit": "Min",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Sts_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "Sts_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.CmdSrc.MCmd_OoS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "MCmd_OoS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATE_REQ_CONF"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "Rotation_Conf",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.CmdSrc.OCmd_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Oper",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATE_HMI_SP"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasRotateCountdown}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Int4",
+          "name": "Rotate_Countdown",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_RotateOnStop"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "Cfg_RotateOnStop",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.OCmd_Reset"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Reset",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_ROTATION_HR"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasAutoRotate}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Rotation_Hour",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.CmdSrc.MCmd_IS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "MCmd_IS",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Val_Demand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Val_Demand",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_DNMTD"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasDemandLineup}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "DemandLineupTimeDelay",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.DateTime_Current.Sec"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "HB",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Cfg_MinDemand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 15,
+          "historicalDeadband": 0.0,
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "MIN",
+          "name": "Cfg_MinDemand",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.CmdSrc.OCmd_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Boolean",
+          "name": "OCmd_Prog",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}_UP_DLY_Emer_TMR.ACC"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasEmerTimer}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "scaleMode": "Off",
+          "readOnly": false,
+          "dataType": "Int4",
+          "name": "Emer_StgUp_Dly_Tmr",
+          "engUnit": "Min",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Motor",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "name": "Motor_18",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 17
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_25",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 24
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_28",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 27
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_06",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 5
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_12",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 11
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_10",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 9
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_23",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 22
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_26",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 25
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_13",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 12
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_21",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 20
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_03",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 2
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_07",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 6
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_27",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 26
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_22",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 21
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_11",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 10
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_08",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 7
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_04",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 3
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_02",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 1
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_19",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 18
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_15",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 14
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "valueSource": "expr",
+          "eventScripts": [
+            {
+              "eventid": "valueChanged",
+              "script": "\tdef updateEnable(startMotor, endMotor, doEanble):\n\t\tif startMotor \u003c 10 and endMotor \u003c 10:\n\t\t\tfor x in range(startMotor+1, endMotor+1):\n\t\t\t\tbase_path\u003d\u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\t\t\t\tbase_list\u003d[\n\t\t\t\tbase_path + \"/Motor_0\" + str(x) + \".Enabled\"\n\t\t\t\t]\n\t\t\t\tsystem.tag.writeAsync(base_list,[doEanble])\n\t\telif startMotor \u003c 10 and endMotor \u003e\u003d 10:\n\t\t\tfor x in range(startMotor+1, 10):\n\t\t\t\tbase_path\u003d\u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\t\t\t\tbase_list\u003d[\n\t\t\t\tbase_path + \"/Motor_0\" + str(x) + \".Enabled\"\n\t\t\t\t]\n\t\t\t\tsystem.tag.writeAsync(base_list,[doEanble])\n\t\t\tfor x in range(10, endMotor+1):\n\t\t\t\tbase_path\u003d\u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\t\t\t\tbase_list\u003d[\n\t\t\t\tbase_path + \"/Motor_\" + str(x) + \".Enabled\"\n\t\t\t\t]\n\t\t\t\tsystem.tag.writeAsync(base_list,[doEanble])\n\t\telse:\n\t\t\tfor x in range(startMotor+1, endMotor+1):\n\t\t\t\tbase_path\u003d\u0027/\u0027.join(tagPath.split(\u0027/\u0027)[:-1])\n\t\t\t\tbase_list\u003d[\n\t\t\t\tbase_path + \"/Motor_\" + str(x) + \".Enabled\"\n\t\t\t\t]\n\t\t\t\tsystem.tag.writeAsync(base_list,[doEanble])\n\t\t\t\t\n\tif initialChange:\n\t\tupdateEnable(0,currentValue.value,True)\n\telif previousValue.value \u003c currentValue.value:\n\t\tupdateEnable(previousValue.value,currentValue.value,True)\n\telif initialChange or previousValue.value \u003e currentValue.value:\n\t\tupdateEnable(currentValue.value,previousValue.value, False)"
+            }
+          ],
+          "expression": "len(split({motors},\",\"))",
+          "name": "motor_count",
+          "executionMode": "EventDriven",
+          "executionRate": 1,
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Motor_30",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 29
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_24",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 23
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_29",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 28
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_16",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 15
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_31",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 30
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_17",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 16
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_09",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 8
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_01",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 0
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_05",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 4
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_14",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 13
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Motor_20",
+          "typeId": "Admin/LL_Motor_v1",
+          "parameters": {
+            "motorNum": {
+              "dataType": "Integer",
+              "value": 19
+            }
+          },
+          "enabled": false,
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "Sts_MotorAvail",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopping",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Cfg_Prio",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStopped",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorRunning",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Mset_MotorOoS",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "MTR_Val_Rank",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Sts_MotorStarting",
+              "tagType": "AtomicTag"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}

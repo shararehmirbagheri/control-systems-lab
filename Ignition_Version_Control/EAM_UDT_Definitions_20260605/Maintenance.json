@@ -1,0 +1,73 @@
+{
+  "name": "Maintenance",
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "dataType": "Boolean",
+      "name": "MaintenanceMode",
+      "readPermissions": {
+        "securityLevels": [],
+        "type": "AllOf"
+      },
+      "tagType": "AtomicTag",
+      "value": false,
+      "valueSource": "memory",
+      "writePermissions": {
+        "securityLevels": [
+          {
+            "children": [],
+            "name": "Authenticated"
+          }
+        ],
+        "type": "AllOf"
+      }
+    },
+    {
+      "dataType": "DateTime",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "name": "Disable_Time",
+      "tagType": "AtomicTag",
+      "valueSource": "memory"
+    },
+    {
+      "dataType": "Boolean",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tif currentValue.value:\n\t\tsystem.tag.writeAsync([\"[.]MaintenanceMode\",\"[.]Disable_Time\"],[False,None])"
+        }
+      ],
+      "executionMode": "TagGroupRate",
+      "expression": "try({[.]Disable_Time}\u003c\u003dnow(10000),false)",
+      "name": "Disable_Monitor",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Boolean",
+      "executionMode": "FixedRate",
+      "executionRate": 500,
+      "expression": "hasChanged({[.]MaintenanceMode})",
+      "name": "MaintenanceMode Changed",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "String",
+      "name": "Note",
+      "tagType": "AtomicTag",
+      "value": "No Note Set",
+      "valueSource": "memory",
+      "writePermissions": {
+        "securityLevels": [
+          {
+            "children": [],
+            "name": "Authenticated"
+          }
+        ],
+        "type": "AllOf"
+      }
+    }
+  ]
+}

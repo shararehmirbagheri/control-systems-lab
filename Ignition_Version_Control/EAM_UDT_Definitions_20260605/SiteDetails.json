@@ -1,0 +1,403 @@
+{
+  "name": "SiteDetails",
+  "parameters": {
+    "display24Hr": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "intelActive": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "intelURL": {
+      "dataType": "String"
+    },
+    "knowledgeFrontID": {
+      "dataType": "String"
+    },
+    "pagingActive": {
+      "dataType": "Integer",
+      "value": 1
+    },
+    "slActive": {
+      "dataType": "Integer",
+      "value": 0
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "dataType": "Float4",
+      "executionMode": "TagGroupRate",
+      "expression": "runScript(\"shared.summarys.siteITLoad\",10000)",
+      "historicalDeadband": 1.0,
+      "historyEnabled": true,
+      "historyMaxAge": 1,
+      "historyProvider": "cnpg",
+      "name": "IT_Load",
+      "sampleMode": "TagGroup",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "alarms": [
+        {
+          "CustomEmailMessage": {
+            "bindType": "Expression",
+            "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eThis is a test Critical Priority Alarm for site: \"+{InstanceName}+\"\u003cbr\u003e\""
+          },
+          "CustomEmailSubject": {
+            "bindType": "Expression",
+            "value": "{name}+\r\n\" \"+\r\n{state}+\r\n\" for \" +\r\n{InstanceName}"
+          },
+          "ackMode": "Unused",
+          "ackPipeline": "Alarms/Ack Alerts",
+          "activePipeline": "Alarms/Critical Alerts",
+          "clearPipeline": "Alarms/Critical Alerts",
+          "displayPath": "",
+          "externalNotify": "True",
+          "label": "Critical Test Alarm",
+          "name": "Critical Test Alarm",
+          "priority": "Critical",
+          "setpointA": 1.0,
+          "shelvingAllowed": false
+        }
+      ],
+      "dataType": "Boolean",
+      "expression": "getMinute({[System]Gateway/CurrentDateTime})%3\u003d0",
+      "name": "Test_Alarm_Critical",
+      "tagType": "AtomicTag",
+      "value": false,
+      "valueSource": "memory"
+    },
+    {
+      "alarms": [
+        {
+          "CustomEmailMessage": {
+            "bindType": "Expression",
+            "value": "{InstanceName}+\": \"+{knowledgeFrontID}"
+          },
+          "CustomEmailSubject": {
+            "bindType": "UDTParameter",
+            "value": "{knowledgeFrontID}"
+          },
+          "ackMode": "Unused",
+          "ackPipeline": "Alarms/Ack Alerts",
+          "activePipeline": "Alarms/Critical Alerts",
+          "enabled": {
+            "bindType": "Expression",
+            "value": "len({knowledgeFrontID})\u003e0"
+          },
+          "externalNotify": "True",
+          "name": "KnowledgeFront Alert",
+          "priority": "Diagnostic",
+          "setpointA": 1.0
+        }
+      ],
+      "dataType": "Boolean",
+      "expression": "getMinute({[System]Gateway/CurrentDateTime})%3\u003d0",
+      "name": "KF_Alert",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Float4",
+      "name": "Disk_Space",
+      "sourceTagPath": "[System]Gateway/Performance/Available Disk Space (MB)",
+      "tagType": "AtomicTag",
+      "valueSource": "reference"
+    },
+    {
+      "dataType": "Boolean",
+      "expression": "{intelActive}\u003d1",
+      "name": "Intel_Active",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "name": "DB",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Boolean",
+          "name": "Available",
+          "sourceTagPath": "[System]Gateway/Database/cnpg/Available",
+          "tagType": "AtomicTag",
+          "valueSource": "reference"
+        },
+        {
+          "name": "Active_Connections",
+          "sourceTagPath": "[System]Gateway/Database/cnpg/ActiveConnections",
+          "tagType": "AtomicTag",
+          "valueSource": "reference"
+        },
+        {
+          "dataType": "Float4",
+          "name": "Queries_Per_Second",
+          "sourceTagPath": "[System]Gateway/Database/cnpg/QueriesPerSecond",
+          "tagType": "AtomicTag",
+          "valueSource": "reference"
+        },
+        {
+          "dataType": "Float4",
+          "name": "Average_Query_Time",
+          "sourceTagPath": "[System]Gateway/Database/cnpg/AvgQueryTime",
+          "tagType": "AtomicTag",
+          "valueSource": "reference"
+        }
+      ]
+    },
+    {
+      "dataType": "DataSet",
+      "executionMode": "TagGroupRate",
+      "expression": "runScript(\"shared.summarys.getLLSRotReq\",10000)",
+      "name": "Rotation_Required",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "name": "Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "expression": "runScript(\u0027shared.summarys.getUDTInstances\u0027,0,{[.]TagProvider}, \"\")",
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            }
+          ]
+        }
+      ],
+      "typeId": "Admin/Alarm_Summary"
+    },
+    {
+      "dataType": "DataSet",
+      "executionMode": "TagGroupRate",
+      "expression": "runScript(\"shared.summarys.allUDTs\",10000)",
+      "name": "UDT_List",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Float4",
+      "name": "CPU_Usage",
+      "sourceTagPath": "[System]Gateway/Performance/CPU Usage",
+      "tagType": "AtomicTag",
+      "valueSource": "reference"
+    },
+    {
+      "dataType": "Float4",
+      "executionMode": "TagGroupRate",
+      "expression": "runScript(\"shared.summarys.siteTotalLoad\",1000)",
+      "historicalDeadband": 1.0,
+      "historyEnabled": true,
+      "historyMaxAge": 1,
+      "historyProvider": "cnpg",
+      "name": "Total_Load",
+      "sampleMode": "TagGroup",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "alarms": [
+        {
+          "CustomEmailMessage": {
+            "bindType": "Expression",
+            "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eThis is a test High Priority Alarm for site: \"+{InstanceName}+\"\u003cbr\u003e\""
+          },
+          "CustomEmailSubject": {
+            "bindType": "Expression",
+            "value": "{name}+\r\n\" \"+\r\n{state}+\r\n\" for \" +\r\n{InstanceName}"
+          },
+          "ackMode": "Unused",
+          "ackPipeline": "Alarms/Ack Alerts",
+          "activePipeline": "Alarms/Critical Alerts",
+          "clearPipeline": "Alarms/Critical Alerts",
+          "externalNotify": "True",
+          "label": "High Test Alarm",
+          "name": "High Test Alarm",
+          "priority": "High",
+          "setpointA": 1.0,
+          "shelvingAllowed": false
+        }
+      ],
+      "dataType": "Boolean",
+      "expression": "getMinute({[System]Gateway/CurrentDateTime})%3\u003d0",
+      "name": "Test_Alarm_High",
+      "tagType": "AtomicTag",
+      "value": false,
+      "valueSource": "memory"
+    },
+    {
+      "dataType": "DataSet",
+      "executionMode": "TagGroupRate",
+      "expression": "runScript(\"shared.summarys.deviceList\",10000,{PathToParentFolder})",
+      "name": "Device_List",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Float4",
+      "historicalDeadband": 1.0,
+      "historyEnabled": true,
+      "historyMaxAge": 1,
+      "historyProvider": "cnpg",
+      "name": "Memory_Usage",
+      "sampleMode": "TagGroup",
+      "sourceTagPath": "[System]Gateway/Performance/Memory Utilization",
+      "tagType": "AtomicTag",
+      "valueSource": "reference"
+    },
+    {
+      "dataType": "Float4",
+      "expression": "{[.]Total_Load}/{[.]IT_Load}",
+      "historyEnabled": true,
+      "historyMaxAge": 1,
+      "historyProvider": "cnpg",
+      "name": "PUE",
+      "sampleMode": "TagGroup",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "String",
+      "name": "Gateway_Name",
+      "sourceTagPath": "[System]Gateway/SystemName",
+      "tagType": "AtomicTag",
+      "valueSource": "reference"
+    },
+    {
+      "dataType": "String",
+      "name": "Intel_URL",
+      "tagType": "AtomicTag",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{intelURL}"
+      },
+      "valueSource": "memory"
+    },
+    {
+      "dataType": "DataSet",
+      "executionMode": "TagGroupRate",
+      "expression": "runScript(\"shared.summarys.getMaintActive\",10000)",
+      "name": "Maintenance_Active",
+      "tagGroup": "Expression10",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Boolean",
+      "expression": "{pagingActive}\u003d1",
+      "name": "Paging_Active",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Boolean",
+      "expression": "{slActive}\u003d1",
+      "name": "SL_Active",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    }
+  ]
+}

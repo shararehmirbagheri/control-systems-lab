@@ -1,0 +1,46 @@
+{
+  "name": "Bad_Data",
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "alarms": [
+        {
+          "CustomEmailMessage": {
+            "bindType": "Expression",
+            "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+split({fullItemPath},\"/\")[4,0]+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+          },
+          "CustomEmailSubject": {
+            "bindType": "Expression",
+            "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\nsplit({fullItemPath},\"/\")[4,0]"
+          },
+          "ackPipeline": "Alarms/Ack Alerts",
+          "activePipeline": "Alarms/Critical Alerts",
+          "clearPipeline": "Alarms/Critical Alerts",
+          "enabled": {
+            "bindType": "Expression",
+            "value": "!({[.]Rollup_Bad_Data/Rollup Changed}||{[.]../../Maintenance/MaintenanceMode Changed})\u0026\u0026!({[.]../../TopStat/Comm_Fail}||{[.]../../TopStat2/Comm_Fail}||{[.]../../TopStat_Aux/Comm_Fail}||{[.]../../TopStat_Input/Comm_Fail}||{[.]../../TopStat_MI/Comm_Fail}||{[.]../../TopStat_Mod/Comm_Fail}||{[.]../../TopStat_Output/Comm_Fail}||{[.]../../TopStat_PLC/Comm_Fail}||{[.]../../TopStat_Subfeed/Comm_Fail}||{[.]../../TopStat_TI/Comm_Fail}||{[.]../../TopStatBatt/Comm_Fail}||{[.]../../TopStatBkr/Comm_Fail}||{[.]../../TopStatMB/Comm_Fail}||{[.]../../TopStatMI/Comm_Fail}||{[.]../../TopStatMod/Comm_Fail}||{[.]../../TopStatPLC/Comm_Fail}||{[.]../../TopStatSNMP/Comm_Fail}||{[.]../../TopStatTI/Comm_Fail})"
+          },
+          "externalNotify": "True",
+          "label": {
+            "bindType": "Expression",
+            "value": "split({fullItemPath},\"/\")[4,0]+\" \"+{name}"
+          },
+          "name": "Bad Data",
+          "priority": {
+            "bindType": "Expression",
+            "value": "if({[.]Rollup_Bad_Data/Rollup Active}||{[.]../../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+          },
+          "setpointA": 1.0,
+          "timeOnDelaySeconds": 30.0
+        }
+      ],
+      "dataType": "Boolean",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "expression": "runScript(\"shared.summarys.isGood\",5000,replace({PathToParentFolder},\"/Data/\"+{InstanceName},\"\"))",
+      "name": "OPC_Data_Bad",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    }
+  ]
+}

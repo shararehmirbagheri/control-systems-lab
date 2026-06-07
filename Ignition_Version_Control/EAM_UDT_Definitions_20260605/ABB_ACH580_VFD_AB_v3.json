@@ -1,0 +1,2920 @@
+{
+  "documentation": "Used to monitor both PLC and Modbus Points from ABB ACH580 VFD",
+  "name": "ABB_ACH580_VFD_AB_v3",
+  "parameters": {
+    "controlLocationReg": {
+      "dataType": "String",
+      "value": "41911.13"
+    },
+    "description": {
+      "dataType": "String",
+      "value": ""
+    },
+    "devicePLC": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasBypassAlarms": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasChiller": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasFaultAlarm": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasFaultCodes": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasFeedback": {
+      "dataType": "Integer",
+      "value": 1
+    },
+    "hasModbus": {
+      "dataType": "Integer",
+      "value": 1
+    },
+    "hasVFD": {
+      "dataType": "Integer",
+      "value": 1
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServerPLC": {
+      "dataType": "String"
+    },
+    "parentPLC": {
+      "dataType": "String"
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "vfdTempReg": {
+      "dataType": "String",
+      "value": "40511"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_VFD_Bypass_Sel/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "VFD_Bypass_Sel",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_VFD_Bypass_Sel/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasBypassAlarms}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "VFD_Bypass_Sel",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_XI_01.Sts_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_NotRdy/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_NotRdy",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_Not_Rdy/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_NotRdy ",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_NotRdy"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Output Voltage",
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Output_Voltage",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Output_Volt"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Stopped",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Stopped"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_{TagName}/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "{TagName}",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_{TagName}/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Drive Over-Temperature Alarm",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Thermal_State",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Therm_State"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Current",
+          "engUnit": "A",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Motor_Current",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Mtr_Amps"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Speed_Mismatch/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Speed_Mismatch_Alarm",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Speed_Mismatch/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Speed Mismatch Alarm",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Speed_Mismatch",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_SPD_FDBK_ALM"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Min_VFD_Spd",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Min_VFD_Spd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Nrdy_Fail/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Nrdy_Fail",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Nrdy_Fail/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Nrdy_Fail",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Alm_FailToStart"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_StartingRev",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_StartingRev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_RunningFwd",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_RunningFwd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Nominal Speed",
+          "engUnit": "rpm",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Nominal_Speed",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Nom_Spd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Val_SpeedFdbk",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Val_SpeedFdbk"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Cfg_UseRunFdbk",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Cfg_UseRunFdbk"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Val_TotRunHrs",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_RT.Val_TotRunHrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "documentation": "Fault Code 1",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFaultCodes}"
+          },
+          "engUnit": "",
+          "expression": "IF({[.]Fault_Code_1_Raw}\u003c1, \"No Fault Code\",\r\nCASE(\r\n{[.]Fault_Code_1_Raw},\r\n1, \"Comms Error\",\r\n2, \"VFD Comms Failure\",\r\n3, \"VFD Over Current\",\r\n4, \"VFD Over Temperature\",\r\n5, \"VFD Over Speed\",\r\n6, \"VFD Over Voltage\",\r\n7, \"VFD Under Voltage\",\r\n8, \"VFD Short Circuit\",\r\n9, \"VFD Ground Fault\",\r\n10, \"VFD Overload\",\r\n11, \"VFD Inverter Overload\",\r\n12, \"VFD Underload\",\r\n13, \"VFD External Fault\",\r\n14, \"VFD Operator Interface Error\",\r\n15, \"VFD Configuration Error\",\r\n16, \"VFD Feedback Error\",\r\n17, \"VFD Output Phase Loss\",\r\n18, \"VFD Stall\",\r\n19, \"VFD Power Unit Error\",\r\n20, \"VFD Input Phase Fault\",\r\n21, \"VFD Internal Failure\",\r\n22, \"VFD STO Active\",\r\n23, \"VFD Other\",\r\n\"Unknown\"))",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fault_Code_1",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentmod}_{suffix}.{deviceMod}.40152@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "engUnit": "sec",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Cfg_FailToStartT",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Cfg_FailToStartT"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Alm_Fault/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Alm_Fault",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Alm_Fault/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFaultAlarm}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Alm_Fault",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_QA.Alm_TgtDisagree"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_Reset",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.OCmd_Reset"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Speed SCALING Maximum (1500 or 1800)",
+          "engUnit": "",
+          "expression": "()",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Val_SpeedFdbk_Scaled",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_SpdFdbk_SCL"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Speed RAW",
+          "engUnit": "",
+          "expression": "()",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Val_SpeedFdbk_RAW",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_SpdFdbk_RAW"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "Fault Code 1 Raw Value",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fault_Code_1_Raw",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Flt_Code1"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Torque",
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Motor_Torque",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Mtr_Torq"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 1000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "kWh",
+          "engUnit": "kWh",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "kWh",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_kWh"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Nominal Current",
+          "engUnit": "A",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Nominal_Current",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Nom_Amps"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "Fault Code 3 Raw Value",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fault_Code_3_Raw",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Flt_Code3"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_IOFault/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_IOFault",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_IOFault/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_IOFault ",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Alm_IOFault"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_StartFwd",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.OCmd_StartFwd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "name": "Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ],
+          "typeId": "Admin/Bad_Data"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "",
+              "clearPipeline": "",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_HB_alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "mode": "AboveValue",
+              "name": "HB_alarm",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_HB_alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 90.0,
+              "setpointB": 4.0
+            }
+          ],
+          "dataType": "Int4",
+          "expression": "secondsBetween({[.]HB.timestamp},now())",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "name": "HB_alarm",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.DateTime_Current.Sec"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_VFD_Bypass_Auto/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "VFD_Bypass_Auto",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_VFD_Bypass_Auto/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasBypassAlarms}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "VFD_Bypass_Auto",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_XI_02.Sts_PV"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Nominal Power",
+          "engUnit": "hp",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Nominal_Power",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Nom_Pwr"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_DriveFault/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_DriveFault",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_DriveFault/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_DriveFault ",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Alm_DriveFault"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": false,
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "PCmd_Auto",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.PCmd_Auto"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{1-hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_Start",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.OCmd_Start"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_Hand/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStatPLC/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_Hand",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_Hand/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Hand",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Hand"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": false,
+          "engUnit": "RPM",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Val_MotorSpeed",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Val_MotorSpeed"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "MCmd_OoS",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.CmdSrc.MCmd_OoS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Err",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Err"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Frequency SCALING",
+          "engUnit": "",
+          "expression": "()",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Val_FreqFdbk_Scaled",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_FreqFdbk_SCL"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "tooltip": {
+            "bindType": "parameter",
+            "binding": "{hasModbus}"
+          },
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_{TagName}/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "{TagName}",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_{TagName}/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "documentation": "Drive Operation Mode - External Control Location \n\nFalse\u003dEXT1 True\u003dEXT2",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Control_Location",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Ctrl_Loc"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Alm_FailToStart/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStatPLC/Comm_Fail}"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Alm_FailToStart",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Alm_FailToStart/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Alm_FailToStart",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Alm_FailToStart"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "PCmd_ClearTotHrs",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_RT.PCmd_ClearTotHrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "documentation": "Fault Code 2",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFaultCodes}"
+          },
+          "engUnit": "",
+          "expression": "IF({[.]Fault_Code_2_Raw}\u003c1, \"No Fault Code\",\r\nCASE(\r\n{[.]Fault_Code_2_Raw},\r\n1, \"Comms Error\",\r\n2, \"VFD Comms Failure\",\r\n3, \"VFD Over Current\",\r\n4, \"VFD Over Temperature\",\r\n5, \"VFD Over Speed\",\r\n6, \"VFD Over Voltage\",\r\n7, \"VFD Under Voltage\",\r\n8, \"VFD Short Circuit\",\r\n9, \"VFD Ground Fault\",\r\n10, \"VFD Overload\",\r\n11, \"VFD Inverter Overload\",\r\n12, \"VFD Underload\",\r\n13, \"VFD External Fault\",\r\n14, \"VFD Operator Interface Error\",\r\n15, \"VFD Configuration Error\",\r\n16, \"VFD Feedback Error\",\r\n17, \"VFD Output Phase Loss\",\r\n18, \"VFD Stall\",\r\n19, \"VFD Power Unit Error\",\r\n20, \"VFD Input Phase Fault\",\r\n21, \"VFD Internal Failure\",\r\n22, \"VFD STO Active\",\r\n23, \"VFD Other\",\r\n\"Unknown\"))",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fault_Code_2",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentmod}_{suffix}.{deviceMod}.40152@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_StoppingRev",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_StoppingRev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "DC Bus Voltage",
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "DC_Bus_Voltage",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_DC_Volt"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "String",
+          "documentation": "Fault Code 3",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFaultCodes}"
+          },
+          "engUnit": "",
+          "expression": "IF({[.]Fault_Code_3_Raw}\u003c1, \"No Fault Code\",\r\nCASE(\r\n{[.]Fault_Code_3_Raw},\r\n1, \"Comms Error\",\r\n2, \"VFD Comms Failure\",\r\n3, \"VFD Over Current\",\r\n4, \"VFD Over Temperature\",\r\n5, \"VFD Over Speed\",\r\n6, \"VFD Over Voltage\",\r\n7, \"VFD Under Voltage\",\r\n8, \"VFD Short Circuit\",\r\n9, \"VFD Ground Fault\",\r\n10, \"VFD Overload\",\r\n11, \"VFD Inverter Overload\",\r\n12, \"VFD Underload\",\r\n13, \"VFD External Fault\",\r\n14, \"VFD Operator Interface Error\",\r\n15, \"VFD Configuration Error\",\r\n16, \"VFD Feedback Error\",\r\n17, \"VFD Output Phase Loss\",\r\n18, \"VFD Stall\",\r\n19, \"VFD Power Unit Error\",\r\n20, \"VFD Input Phase Fault\",\r\n21, \"VFD Internal Failure\",\r\n22, \"VFD STO Active\",\r\n23, \"VFD Other\",\r\n\"Unknown\"))",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fault_Code_3",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentmod}_{suffix}.{deviceMod}.40152@Word"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "DriveFaultTime",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_IOFltDlyT"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "engUnit": "sec",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Cfg_FailToStopT",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Cfg_FailToStopT"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Frequency RAW",
+          "engUnit": "",
+          "expression": "()",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 900000,
+          "historyMaxAgeUnits": "MS",
+          "historyProvider": "cnpg",
+          "name": "Val_FreqFdbk_RAW",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_FreqFdbk_RAW"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "tooltip": {
+            "bindType": "parameter",
+            "binding": "{hasModbus}"
+          },
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Power",
+          "engUnit": "kW",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Motor_Power",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Mtr_Pwr"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_Prog",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.CmdSrc.OCmd_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_FailToStart",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_FailToStart"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{(1-hasVFD)*hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Stopping",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Stopping"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_Stop",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.OCmd_Stop"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{(1-hasVFD)*hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Starting",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Starting"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Drive Standard Analog Output Raw Value",
+          "engUnit": "mA",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "AO01_Value",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_AO01_Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Drive Standard Analog Input 1 Scaled Value",
+          "engUnit": "cts",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "AI01_Value",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_AI01_Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_StartingFwd",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_StartingFwd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Speed Feedback (Actual) From Drive",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasModbus}"
+          },
+          "engUnit": "rpm",
+          "expression": "({[.]Val_SpeedFdbk_RAW}/20000)*{[.]Val_SpeedFdbk_Scaled}",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Val_SpeedFdbk_Mod",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentmod}_{suffix}.{device}.40101@Short"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Drive Temperature Relative to Temperature Fault Limit",
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "VFD_Temperature",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_VFD_Temp"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "Fault Code 2 Raw Value",
+          "engUnit": "",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "DAY",
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Fault_Code_2_Raw",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Flt_Code2"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_Oper",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.CmdSrc.OCmd_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_RunningRev",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_RunningRev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{1-hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Running",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Running"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_FailToStop",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_FailToStop"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Val_SpeedRef",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Val_SpeedRef"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_FailToStop/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_FailToStop",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_FailToStop/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasFeedback}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Alm_FailToStop",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Alm_FailToStop"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_Oper/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_Oper",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_Oper/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Low\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Oper",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Oper"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Frequency",
+          "engUnit": "Hz",
+          "expression": "({[.]Val_FreqFdbk_RAW}/20000)*{[.]Val_FreqFdbk_Scaled}",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyMaxAgeUnits": "HOUR",
+          "historyProvider": "cnpg",
+          "name": "Val_FreqFdbk",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentmod}_{suffix}.{device}.40101@Short"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "tooltip": {
+            "bindType": "parameter",
+            "binding": "{hasModbus}"
+          },
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OCmd_StartRev",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.OCmd_StartRev"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasChiller}"
+          },
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "CHLR_Load",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_PCT.Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Nominal Frequency",
+          "engUnit": "Hz",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Nominal_Frequency",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Nom_Freq"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Drive Standard Discrete Input21 Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "DI02_Status",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_DI02_Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "engUnit": "%",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "OSet_SpeedRef",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.OSet_SpeedRef"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_Prog",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_Prog"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_StoppingFwd",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_StoppingFwd"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Val_Cur_Run_Hrs",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_RT.Val_CurRunHrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_OoS",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_OoS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int4",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "HB",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.DateTime_Current.Sec"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Inverter MWh Counter",
+          "engUnit": "MWh",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "MWh_Counter",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_MWh_Counter"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "alarms": [
+            {
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "ackPipeline": "Alarms/Ack Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]Rollup_Sts_NotReady/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})"
+              },
+              "externalNotify": "True",
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "name": "Sts_NotReady",
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]Rollup_Sts_NotReady/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+              },
+              "setpointA": 1.0
+            }
+          ],
+          "dataType": "Boolean",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasVFD}"
+          },
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "Sts_NotReady",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.Sts_NotReady"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "documentation": "Drive Standard Discrete Input 1 Status",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "DI01_Status",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_DI01_Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Motor Nominal Voltage",
+          "engUnit": "V",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "Nominal_Voltage",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_Nom_Volt"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Linear",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "Drive Standard Analog Input 2 Scaled Value",
+          "engUnit": "cts",
+          "historicalDeadband": 1.0,
+          "historyEnabled": true,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "historyTimeDeadband": 10,
+          "name": "AI02_Value",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}_AI02_Val"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "rawHigh": 10000.0,
+          "readOnly": true,
+          "sampleMode": "OnChange",
+          "scaleMode": "Off",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyEnabled": false,
+          "historyMaxAge": 1,
+          "historyProvider": "cnpg",
+          "name": "MCmd_IS",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parentPLC}_{suffix}.{parentPLC}.{devicePLC}.CmdSrc.MCmd_IS"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          },
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        }
+      ]
+    },
+    {
+      "name": "TopStatPLC",
+      "parameters": {
+        "device": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{devicePLC}"
+          }
+        },
+        "opcServer": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{opcServerPLC}"
+          }
+        },
+        "parent": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{parentPLC}"
+          }
+        },
+        "suffix": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{suffix}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/TopStat_AB"
+    },
+    {
+      "name": "Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Maintenance"
+    },
+    {
+      "name": "Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Meta"
+    },
+    {
+      "name": "TopStat",
+      "parameters": {
+        "device": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{deviceMod}"
+          }
+        },
+        "opcServer": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{opcServerMod}"
+          }
+        },
+        "parent": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{parentMod}"
+          }
+        },
+        "suffix": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{suffix}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/TopStat"
+    },
+    {
+      "dataType": "DateTime",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "name": "version",
+      "tagType": "AtomicTag",
+      "value": 1780533606312,
+      "valueSource": "memory"
+    },
+    {
+      "name": "Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "ActiveOrUnack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "Unack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}",
+              "name": "Active",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Low",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Critical",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Diagnostic",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "High",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Medium",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Alarm_Summary"
+    }
+  ],
+  "typeId": ""
+}

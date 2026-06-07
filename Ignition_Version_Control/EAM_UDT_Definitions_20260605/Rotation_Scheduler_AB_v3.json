@@ -1,0 +1,553 @@
+{
+  "documentation": "",
+  "name": "Rotation_Scheduler_AB_v3",
+  "parameters": {
+    "description": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": ""
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "hasDayOfWeek": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasDays": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasEnable": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "hasHours": {
+      "dataType": "Integer",
+      "value": 0
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String",
+      "value": ""
+    },
+    "parent": {
+      "dataType": "String",
+      "value": ""
+    },
+    "plcName": {
+      "dataType": "String"
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": ""
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "dataType": "Int4",
+      "enabled": true,
+      "name": "Alarm_Summary",
+      "readOnly": false,
+      "readPermissions": {
+        "securityLevels": [],
+        "type": "AllOf"
+      },
+      "tagGroup": "Default",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "ActiveOrUnack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+              "name": "Unack",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}",
+              "name": "Active",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearAcked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ActiveUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "ClearUnacked",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "dataType": "Document",
+          "executionMode": "FixedRate",
+          "executionRate": 1000,
+          "expression": "runScript(\u0027shared.summarys.getUDTInstances\u0027,0,{[.]TagProvider}, left({PathToParentFolder},lastIndexOf({PathToTag},\"Alarm_Summary\")))",
+          "name": "Summary",
+          "readOnly": true,
+          "tagGroup": "Default",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "expression": "jsonGet({[.]Summary}, \u0027class\u0027)",
+          "name": "Style",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "eventScripts": [
+            {
+              "eventid": "valueChanged",
+              "script": "\tproviderName \u003d tagPath[tagPath.find(\"[\")+1:tagPath.find(\"]\")]\n\tif providerName !\u003d currentValue.value:\n\t\tsystem.tag.writeBlocking(\"[.]TagProvider\", providerName)"
+            }
+          ],
+          "name": "TagProvider",
+          "tagType": "AtomicTag",
+          "valueSource": "memory"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Critical",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Low",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "High",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Diagnostic",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Shelved",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            },
+            {
+              "dataType": "Int4",
+              "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+              "name": "Medium",
+              "readOnly": true,
+              "tagType": "AtomicTag",
+              "valueSource": "expr"
+            }
+          ]
+        },
+        {
+          "dataType": "String",
+          "expression": "jsonGet({[.]Summary}, \u0027state\u0027)",
+          "name": "State",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "expression": "jsonGet({[.]Summary}, \u0027priority\u0027)",
+          "name": "Priority",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "expression": "jsonGet({[.]Summary}, \u0027priorityUnack\u0027)",
+          "name": "PriorityUnack",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Boolean",
+          "expression": "jsonGet({[.]Summary}, \u0027hasUnackAlarm\u0027)",
+          "name": "HasUnack",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        }
+      ],
+      "typeId": "Admin/Alarm_Summary",
+      "writePermissions": {
+        "securityLevels": [],
+        "type": "AllOf"
+      }
+    },
+    {
+      "name": "TopStat",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/TopStat_AB"
+    },
+    {
+      "name": "Meta",
+      "parameters": {
+        "Description": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{description}"
+          }
+        },
+        "Floor": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{floor}"
+          }
+        },
+        "Location": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{location}"
+          }
+        },
+        "Room": {
+          "dataType": "String",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{room}"
+          }
+        }
+      },
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "dataType": "String",
+          "expression": "split({RootInstanceName},\"_\")[0,0]+\"_\"+split({RootInstanceName},\"_\")[1,0]",
+          "name": "Building",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "name": "Location",
+          "tagType": "AtomicTag",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{Location}"
+          },
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "String",
+          "expression": "if({Description}\u003d\"\",split({RootInstanceName},\"_\")[2,0],{Description})",
+          "name": "Description",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "dataType": "String",
+          "name": "Floor",
+          "tagType": "AtomicTag",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{Floor}"
+          },
+          "valueSource": "memory"
+        },
+        {
+          "dataType": "String",
+          "expression": "split({PathToParentFolder},\"/\")[0,0]",
+          "name": "Area",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "name": "Room",
+          "tagType": "AtomicTag",
+          "value": {
+            "bindType": "parameter",
+            "binding": "{Room}"
+          },
+          "valueSource": "memory"
+        }
+      ],
+      "typeId": "Admin/Meta"
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Boolean",
+          "documentation": "Scheduler Enable",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasEnable}"
+          },
+          "name": "Ocmd_Enable",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{parent}.{device}.Enable"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "name": "Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ],
+          "typeId": "Admin/Bad_Data"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "The number of hours between automatic rotations",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasHours}"
+          },
+          "engUnit": "Hrs",
+          "name": "Cfg_Rotation_Hours",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_Hrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Int4",
+          "documentation": "The day of the week to perform automatic rotations, starting with Sunday as 0",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasDayOfWeek}"
+          },
+          "engUnit": "",
+          "name": "Cfg_Rotation_Day_of_Week",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_Hrs"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        },
+        {
+          "dataType": "Float4",
+          "documentation": "The number of days between automatic rotations",
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{hasDays}"
+          },
+          "engUnit": "Days",
+          "name": "Cfg_Rotation_Days",
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{plcName}.{device}.Cfg_Days"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "tagType": "AtomicTag",
+          "valueSource": "opc"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "dataType": "Boolean",
+          "executionMode": "FixedRate",
+          "executionRate": 500,
+          "expression": "hasChanged({[.]MaintenanceMode})",
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "String",
+          "name": "Note",
+          "tagType": "AtomicTag",
+          "value": "No Note Set",
+          "valueSource": "memory",
+          "writePermissions": {
+            "securityLevels": [
+              {
+                "children": [],
+                "name": "Authenticated"
+              }
+            ],
+            "type": "AllOf"
+          }
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "dataType": "Boolean",
+          "name": "MaintenanceMode",
+          "readPermissions": {
+            "securityLevels": [],
+            "type": "AllOf"
+          },
+          "tagType": "AtomicTag",
+          "value": false,
+          "valueSource": "memory",
+          "writePermissions": {
+            "securityLevels": [
+              {
+                "children": [],
+                "name": "Authenticated"
+              }
+            ],
+            "type": "AllOf"
+          }
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        }
+      ],
+      "typeId": "Admin/Maintenance"
+    },
+    {
+      "dataType": "DateTime",
+      "formatString": "yyyy-MM-dd h:mm:ss aa",
+      "name": "version",
+      "tagType": "AtomicTag",
+      "value": 1780435397582,
+      "valueSource": "memory"
+    }
+  ],
+  "typeId": ""
+}

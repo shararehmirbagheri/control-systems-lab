@@ -1,0 +1,208 @@
+{
+  "dataType": "Int4",
+  "enabled": true,
+  "name": "Alarm_Summary",
+  "readOnly": false,
+  "readPermissions": {
+    "securityLevels": [],
+    "type": "AllOf"
+  },
+  "tagGroup": "Default",
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "dataType": "String",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tproviderName \u003d tagPath[tagPath.find(\"[\")+1:tagPath.find(\"]\")]\n\tif providerName !\u003d currentValue.value:\n\t\tsystem.tag.writeBlocking(\"[.]TagProvider\", providerName)"
+        }
+      ],
+      "name": "TagProvider",
+      "tagType": "AtomicTag",
+      "valueSource": "memory"
+    },
+    {
+      "dataType": "String",
+      "expression": "jsonGet({[.]Summary}, \u0027state\u0027)",
+      "name": "State",
+      "readOnly": true,
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "String",
+      "expression": "jsonGet({[.]Summary}, \u0027priorityUnack\u0027)",
+      "name": "PriorityUnack",
+      "readOnly": true,
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "name": "States",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+          "name": "ClearUnacked",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+          "name": "ActiveAcked",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+          "name": "Shelved",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+          "name": "ActiveUnacked",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027stateCounts.\u0027 + {TagName})",
+          "name": "ClearAcked",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        }
+      ]
+    },
+    {
+      "name": "Totals",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}",
+          "name": "Active",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "expression": "{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+          "name": "Unack",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "expression": "{[.]../States/ActiveAcked}+{[.]../States/ActiveUnacked}+{[.]../States/ClearUnacked}",
+          "name": "ActiveOrUnack",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        }
+      ]
+    },
+    {
+      "dataType": "Boolean",
+      "expression": "jsonGet({[.]Summary}, \u0027hasUnackAlarm\u0027)",
+      "name": "HasUnack",
+      "readOnly": true,
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "name": "Priorities",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+          "name": "Diagnostic",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+          "name": "Medium",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+          "name": "Shelved",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+          "name": "High",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+          "name": "Low",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        },
+        {
+          "dataType": "Int4",
+          "expression": "jsonGet({[.]../Summary}, \u0027priorityCounts.\u0027 + {TagName})",
+          "name": "Critical",
+          "readOnly": true,
+          "tagType": "AtomicTag",
+          "valueSource": "expr"
+        }
+      ]
+    },
+    {
+      "dataType": "String",
+      "expression": "jsonGet({[.]Summary}, \u0027priority\u0027)",
+      "name": "Priority",
+      "readOnly": true,
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "String",
+      "expression": "jsonGet({[.]Summary}, \u0027class\u0027)",
+      "name": "Style",
+      "readOnly": true,
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    },
+    {
+      "dataType": "Document",
+      "executionMode": "FixedRate",
+      "executionRate": 1000,
+      "expression": "runScript(\u0027shared.summarys.getUDTInstances\u0027,0,{[.]TagProvider}, left({PathToParentFolder},lastIndexOf({PathToTag},\"Alarm_Summary\")))",
+      "name": "Summary",
+      "readOnly": true,
+      "tagGroup": "Default",
+      "tagType": "AtomicTag",
+      "valueSource": "expr"
+    }
+  ],
+  "writePermissions": {
+    "securityLevels": [],
+    "type": "AllOf"
+  }
+}

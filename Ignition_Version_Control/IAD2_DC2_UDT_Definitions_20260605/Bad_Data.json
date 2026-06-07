@@ -1,0 +1,46 @@
+{
+  "name": "Bad_Data",
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.isGood\",5000,replace({PathToParentFolder},\"/Data/\"+{InstanceName},\"\"))",
+      "dataType": "Boolean",
+      "alarms": [
+        {
+          "setpointA": 1.0,
+          "ackPipeline": "Alarms/Ack Alerts",
+          "activePipeline": "Alarms/Critical Alerts",
+          "timeOnDelaySeconds": 30.0,
+          "name": "Bad Data",
+          "clearPipeline": "Alarms/Critical Alerts",
+          "externalNotify": "True",
+          "CustomEmailMessage": {
+            "bindType": "Expression",
+            "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+split({fullItemPath},\"/\")[4,0]+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+          },
+          "CustomEmailSubject": {
+            "bindType": "Expression",
+            "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\nsplit({fullItemPath},\"/\")[4,0]"
+          },
+          "label": {
+            "bindType": "Expression",
+            "value": "split({fullItemPath},\"/\")[4,0]+\" \"+{name}"
+          },
+          "priority": {
+            "bindType": "Expression",
+            "value": "if({[.]Rollup_Bad_Data/Rollup Active}||{[.]../../Maintenance/MaintenanceMode},\"Low\",\"High\")"
+          },
+          "enabled": {
+            "bindType": "Expression",
+            "value": "!({[.]Rollup_Bad_Data/Rollup Changed}||{[.]../../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../../TopStat/Comm_Fail}"
+          }
+        }
+      ],
+      "name": "OPC_Data_Bad",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "tagType": "AtomicTag"
+    }
+  ]
+}

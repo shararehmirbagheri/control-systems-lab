@@ -1,0 +1,189 @@
+{
+  "name": "lineupSummary",
+  "parameters": {
+    "Has_Electrical": {
+      "dataType": "String",
+      "value": "false"
+    },
+    "Has_Cooling": {
+      "dataType": "String",
+      "value": "false"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "valueSource": "memory",
+      "dataType": "StringArray",
+      "name": "Suites",
+      "tagType": "AtomicTag"
+    },
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tif currentValue.value:\n\t\tsystem.tag.writeBlocking([\"[.]./Parameters.Has_Electrical\"],True)\n\telse:\n\t\tsystem.tag.writeBlocking([\"[.]./Parameters.Has_Electrical\"],False)"
+        }
+      ],
+      "expression": "runScript(\"shared.summarys.hasFolder\",5000,{InstanceName},\"Electrical\")",
+      "dataType": "Boolean",
+      "name": "Has_Electrical",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "enabled": true,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.averageRelHum\",10000,{InstanceName})",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "engUnit": "%",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Average_Hum",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.totalLoad\",10000,{InstanceName})",
+      "historicalDeadband": 1.0,
+      "tagGroup": "Expression10",
+      "engUnit": "kW",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Total_Load",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 10000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "valueSource": "expr",
+      "eventScripts": [
+        {
+          "eventid": "valueChanged",
+          "script": "\tif currentValue.value:\n\t\tsystem.tag.writeBlocking([\"[.]./Parameters.Has_Cooling\"],True)\n\telse:\n\t\tsystem.tag.writeBlocking([\"[.]./Parameters.Has_Cooling\"],False)"
+        }
+      ],
+      "expression": "runScript(\"shared.summarys.hasFolder\",5000,{InstanceName},\"Cooling\")",
+      "dataType": "Boolean",
+      "name": "Has_Cooling",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "enabled": true,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.electricalAlarms\",5000,{InstanceName})",
+      "dataType": "Float4",
+      "name": "Electrical_Alarms",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.coolingAlarms\",5000,{InstanceName})",
+      "dataType": "Float4",
+      "name": "Mechanical_Alarms",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.itLoad\",10000,{InstanceName})",
+      "historicalDeadband": 1.0,
+      "tagGroup": "Expression10",
+      "engUnit": "kW",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "IT_Load",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 10000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "expression": "runScript(\"shared.summarys.thAlarms\",5000,{InstanceName})",
+      "dataType": "Float4",
+      "name": "Environmental_Alarms",
+      "executionMode": "FixedRate",
+      "executionRate": 5000,
+      "tagType": "AtomicTag"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Cooling}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "runScript(\"shared.summarys.averageTemp\",10000,{InstanceName})",
+      "historicalDeadband": 0.1,
+      "tagGroup": "Expression10",
+      "engUnit": "°F",
+      "tagType": "AtomicTag",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "Average_Temp",
+      "historyEnabled": true,
+      "executionMode": "TagGroupRate",
+      "executionRate": 1000,
+      "sampleMode": "TagGroup"
+    },
+    {
+      "enabled": {
+        "bindType": "parameter",
+        "binding": "{Has_Electrical}"
+      },
+      "valueSource": "expr",
+      "historyMaxAge": 1,
+      "expression": "{[.]Total_Load}/{[.]IT_Load}",
+      "dataType": "Float4",
+      "historyProvider": "cnpg",
+      "name": "PUE",
+      "historyEnabled": true,
+      "tagGroup": "Expression10",
+      "sampleMode": "TagGroup",
+      "tagType": "AtomicTag"
+    }
+  ]
+}

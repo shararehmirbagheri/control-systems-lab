@@ -1,0 +1,2511 @@
+{
+  "name": "SnC_6802_MW_Switch_DNP_v1",
+  "typeId": "",
+  "parameters": {
+    "parent": {
+      "dataType": "String"
+    },
+    "location": {
+      "dataType": "String",
+      "value": ""
+    },
+    "suffix": {
+      "dataType": "String",
+      "value": "CH"
+    },
+    "floor": {
+      "dataType": "String",
+      "value": ""
+    },
+    "device": {
+      "dataType": "String",
+      "value": {
+        "bindType": "parameter",
+        "binding": "{TagName}"
+      }
+    },
+    "room": {
+      "dataType": "String",
+      "value": ""
+    },
+    "opcServer": {
+      "dataType": "String"
+    }
+  },
+  "tagType": "UdtType",
+  "tags": [
+    {
+      "name": "TopStat",
+      "typeId": "Admin/TopStat",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Failed Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Hostname",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Successful Reads",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Comm_Fail",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Enabled",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Alarms",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "name": "Rollup",
+          "tagType": "Folder"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "hasChanged({[.]../Data/Status})",
+          "dataType": "Boolean",
+          "name": "Status_Changed",
+          "executionMode": "FixedRate",
+          "executionRate": 500,
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "valueSource": "expr",
+          "expression": "if({[.]../Data/CB_Normal_State}\u003d1,{[.]../Data/Pos}\u003d2,false)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "NO Breaker Closed",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/CB_NO/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/CB_NO/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "CB_NO",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Breaker Status Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0,\"Medium\",if({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1,\"Diagnostic\",\"Low\"))"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Breaker_Status_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Breaker_Status_Alarm",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "if({[.]../Data/CB_Normal_State}\u003d2,{[.]../Data/Pos}\u003d1,false)",
+          "dataType": "Boolean",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "NC Breaker Open",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/CB_NC/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/CB_NC/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "name": "CB_NC",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Maintenance",
+      "typeId": "Admin/Maintenance",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "MaintenanceMode Changed",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "MaintenanceMode",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Monitor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Disable_Time",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Alarm_Summary",
+      "typeId": "Admin/Alarm_Summary",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Summary",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "TagProvider",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priority",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "States",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "ClearUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ClearAcked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveUnacked",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "Style",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Priorities",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Critical",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Shelved",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Medium",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Low",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "High",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Diagnostic",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "HasUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Totals",
+          "tagType": "Folder",
+          "tags": [
+            {
+              "name": "Active",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "Unack",
+              "tagType": "AtomicTag"
+            },
+            {
+              "name": "ActiveOrUnack",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "name": "PriorityUnack",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "State",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Discrete",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.98.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Summary_Error",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Summary_Error/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Summary_Error/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Summary_Error",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.6.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Disabled",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.62.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Tripped_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Tripped_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Tripped_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Tripped_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.75.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Low_Pressure",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Low_Pressure/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Low_Pressure/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Low_Pressure",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.29.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Phase_B_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Phase_B_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Phase_B_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Phase_B_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.16.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Battery_Bad",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Battery_Bad/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Battery_Bad/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Battery_Bad",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.83.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Grounded",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Bad_Data",
+          "typeId": "Admin/Bad_Data",
+          "tagType": "UdtInstance",
+          "tags": [
+            {
+              "name": "OPC_Data_Bad",
+              "tagType": "AtomicTag"
+            }
+          ]
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.84.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Grounded",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.22.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Battery_Low",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Battery_Low/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Battery_Low/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Battery_Low",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.4.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Closed",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.33.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Ground_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Ground_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Ground_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Ground_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.34.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Ground_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Ground_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Ground_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Ground_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.96.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Summary_Warning",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Summary_Warning/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Summary_Warning/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Summary_Warning",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Rollup",
+          "tagType": "Folder"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.32.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Phase_C_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Phase_C_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Phase_C_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Phase_C_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.36.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Voltage_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Voltage_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Voltage_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Voltage_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.30.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Phase_B_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Phase_B_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Phase_B_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Phase_B_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.31.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Phase_C_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Phase_C_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Phase_C_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Phase_C_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.67.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Tripped_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Tripped_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Tripped_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Tripped_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.44.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Not_All_Teams_Xfer_Rdy",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Not_All_Teams_Xfer_Rdy/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Not_All_Teams_Xfer_Rdy/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Not_All_Teams_Xfer_Rdy",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.13.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.0.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Open",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Open/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Open/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Open",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.97.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Summary_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Summary_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Summary_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Summary_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.27.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Phase_A_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Phase_A_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Phase_A_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Phase_A_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.35.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Voltage_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Voltage_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Voltage_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Voltage_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.1.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Open",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Open/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Open/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Open",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.3.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Closed",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.7.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "dataType": "Boolean",
+          "historicalDeadband": 1.0,
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Disabled",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.28.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_02_Phase_A_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_02_Phase_A_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_02_Phase_A_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_02_Phase_A_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.1.0.12.Value@Boolean"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcserver}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "expression": "({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d0)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d1)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d2)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d3)||\r\n({[.]../Data/Pos}\u003d0\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d1\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d2\u0026\u0026{[.]../Data/RackPos}\u003d4)||\r\n({[.]../Data/Pos}\u003d3\u0026\u0026{[.]../Data/RackPos}\u003d4)",
+          "historicalDeadband": 1.0,
+          "dataType": "Boolean",
+          "historyProvider": "cnpg",
+          "alarms": [
+            {
+              "setpointA": 1.0,
+              "ackPipeline": "Alarms/Critical Alerts",
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 10.0,
+              "name": "Switch_01_Overcurrent_Alarm",
+              "timeOffDelaySeconds": 10.0,
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({[.]../Data/Status})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{[.]../Data/Status}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{[.]../Data/Status}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]RollUp/Switch_01_Overcurrent_Alarm/Rollup Active}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Medium\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]RollUp/Switch_01_Overcurrent_Alarm/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed}||{[.]Status_Changed})"
+              }
+            }
+          ],
+          "name": "Switch_01_Overcurrent_Alarm",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        }
+      ]
+    },
+    {
+      "name": "Data",
+      "tagType": "Folder",
+      "tags": [
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.8.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Amps_B",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "{[.]CB_Position}+1",
+          "name": "Pos",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.16.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Volts_C_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Volts_A_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Switch_01_Volts_C_Raw}*16.6",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Volts_C",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Switch_01_Volts_A_Raw}*16.6",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Volts_A",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.6.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Amps_N",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Switch_02_Volts_A_Raw}*16.6",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Volts_A",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.300041.0"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "readOnly": true,
+          "dataType": "Boolean",
+          "name": "CB_Position",
+          "tagType": "AtomicTag"
+        },
+        {
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "({[.]Switch_02_Volts_A}+{[.]Switch_02_Volts_B}+{[.]Switch_02_Volts_C})/3",
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "HOUR",
+          "name": "Switch_02_Volts_LL_Avg",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.17.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Volts_A_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.7.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Amps_A",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.2.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Amps_N",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.32.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "F",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Temperature",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Switch_01_Volts_B_Raw}*16.6",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Volts_B",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "({[.]Volts_AB}+{[.]Volts_BC}+{[.]Volts_CA})/3",
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historicalDeadband": 1.0,
+          "historyMaxAgeUnits": "HOUR",
+          "name": "Volts_LL_Avg",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "memory",
+          "name": "CB_Normal_State",
+          "value": 0,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.5.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Amps_C",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Switch_02_Volts_B_Raw}*16.6",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Volts_B",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.9.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Amps_C",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "({[.]Amps_A}+{[.]Amps_B}+{[.]Amps_C})/3",
+          "dataType": "Float4",
+          "name": "Amps_Avg",
+          "tagType": "AtomicTag"
+        },
+        {
+          "valueSource": "expr",
+          "expression": "\"Breaker Position is \"+case({[.]Pos},\r\n0,\"Unknown\",\r\n1,\"Open\",\r\n2,\"Closed\",\r\n3,\"Invalid\",\r\n\"Invalid\")\r\n+\" and Rack Position is \"+case({[.]RackPos},\r\n0,\"Unknown\",\r\n1,\"Racked Out\",\r\n2,\"Racked In\",\r\n3,\"Invalid\",\r\n\"Invalid\")",
+          "dataType": "String",
+          "name": "Status",
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.14.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Switch_02_Volts_C_Raw}*16.6",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Volts_C",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.33.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Battery_Voltage_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "valueSource": "memory",
+          "name": "Nominal_Volts",
+          "value": 480,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.3.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Amps_A",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.33.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "{[.]Battery_Voltage_Raw}*0.035",
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Off",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Battery_Voltage",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "valueSource": "expr",
+          "historyMaxAge": 1,
+          "expression": "({[.]Switch_01_Volts_A}+{[.]Switch_01_Volts_B}+{[.]Switch_01_Volts_C})/3",
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "HOUR",
+          "name": "Switch_01_Volts_LL_Avg",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.4.Value@Double"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "A",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Amps_B",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "valueSource": "memory",
+          "name": "Amp_Rating",
+          "value": 1000,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.15.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_01_Volts_B_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "valueSource": "memory",
+          "name": "RackPos",
+          "value": 2,
+          "tagType": "AtomicTag"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.18.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Volts_B_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "valueSource": "expr",
+          "historyMaxAge": 24,
+          "expression": "if({[.]Amps_A}\u003e{[.]Amps_B}\u0026\u0026{[.]Amps_A}\u003e{[.]Amps_C},{[.]Amps_A}/{[.]amp_Rating}*100,if({[.]Amps_B}\u003e{[.]Amps_A}\u0026\u0026{[.]Amps_B}\u003e{[.]Amps_C},{[.]Amps_B}/{[.]amp_Rating}*100,{[.]Amps_C}/{[.]amp_Rating}*100))",
+          "historicalDeadband": 1.0,
+          "alarms": [
+            {
+              "mode": "BelowValue",
+              "setpointA": -1.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 30.0,
+              "name": "Percent Load Lo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            },
+            {
+              "mode": "AboveValue",
+              "setpointA": 99.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 30.0,
+              "name": "Percent Load Hi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../alarms/RollUp/Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            },
+            {
+              "mode": "BelowValue",
+              "setpointA": -2.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 30.0,
+              "name": "Percent Load LoLo",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "displayPath": "",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            },
+            {
+              "mode": "AboveValue",
+              "setpointA": 100.0,
+              "activePipeline": "Alarms/Critical Alerts",
+              "timeOnDelaySeconds": 30.0,
+              "name": "Percent Load HiHi",
+              "clearPipeline": "Alarms/Critical Alerts",
+              "externalNotify": "True",
+              "CustomEmailMessage": {
+                "bindType": "Expression",
+                "value": "\"\u003chtml\u003eTime: \"+toStr({Timestamp})+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eLineup: \"+split({fullItemPath},\"/\")[1,0]+\"\u003cbr\u003e\"+\r\n\"\u003chtml\u003eDevice: \"+{InstanceName}+\"\u003cbr\u003e\"+\r\n\"Alarm: \"+{name}+\"\u003cbr\u003e\"+\r\n\"Has changed to : \" + toSTR({State})+\"\u003cbr\u003e\""
+              },
+              "CustomEmailSubject": {
+                "bindType": "Expression",
+                "value": "\"Alarm - \"+\r\n{name}+\r\n\" \"+\r\n{state}+\r\n\" on \" +\r\n{InstanceName}"
+              },
+              "label": {
+                "bindType": "Expression",
+                "value": "{InstanceName}+\" \"+{name}"
+              },
+              "priority": {
+                "bindType": "Expression",
+                "value": "if({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode},\"Low\",\"Critical\")"
+              },
+              "enabled": {
+                "bindType": "Expression",
+                "value": "!({[.]../alarms/RollUp/Output_Percent_Load/Rollup Changed}||{[.]../Maintenance/MaintenanceMode Changed})\u0026\u0026!{[.]../TopStat/Comm_Fail}"
+              }
+            }
+          ],
+          "tagType": "AtomicTag",
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "historyMaxAgeUnits": "HOUR",
+          "name": "Percent_Load",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        },
+        {
+          "opcItemPath": {
+            "bindType": "parameter",
+            "binding": "nsu\u003dTOP Server;s\u003d{parent}_{suffix}.{device}.30.0.19.Value@Double"
+          },
+          "enabled": {
+            "bindType": "parameter",
+            "binding": "{useAmpsOnly}"
+          },
+          "opcServer": {
+            "bindType": "parameter",
+            "binding": "{opcServer}"
+          },
+          "valueSource": "opc",
+          "historyMaxAge": 1,
+          "historicalDeadband": 1.0,
+          "engUnit": "V",
+          "tagType": "AtomicTag",
+          "scaleMode": "Linear",
+          "readOnly": true,
+          "dataType": "Float4",
+          "historyProvider": "cnpg",
+          "name": "Switch_02_Volts_C_Raw",
+          "historyEnabled": true,
+          "sampleMode": "TagGroup"
+        }
+      ]
+    },
+    {
+      "name": "Meta",
+      "typeId": "Admin/Meta",
+      "tagType": "UdtInstance",
+      "tags": [
+        {
+          "name": "Description",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Room",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Building",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Location",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Floor",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Note",
+          "tagType": "AtomicTag"
+        },
+        {
+          "name": "Area",
+          "tagType": "AtomicTag"
+        }
+      ]
+    }
+  ]
+}
