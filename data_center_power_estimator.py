@@ -1,6 +1,6 @@
 # Data Center Power Estimator
 
-print("=== QTS Data Center Power Estimator ===")
+print("===  Data Center Power Estimator ===")
 
 num_racks = int(input("Number of racks: "))
 avg_kw_per_rack = float(input("Average kW per rack: "))
