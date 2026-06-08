@@ -24,37 +24,10 @@ The goal is to simplify troubleshooting, version tracking, and configuration man
 ---
 
 ## Repository Structure
-
-├── Ignition_Version_Control/
-│
-├── EAM_UDT_Definitions_20260605/
-│   Exported Ignition UDT definitions
-│
-├── IAD2_DC2_UDT_Definitions_20260605/
-│   Exported Ignition UDT definitions
-│
-├── compare_folders.py
-│   Compare two folders and report differences
-│
-├── compare_one_json_visual.py
-│   Visual JSON comparison tool
-│
-├── clean_json_difference.html
-│   HTML report showing JSON differences
-│
-├── json_difference_highlight.html
-│   Highlighted JSON comparison report
-│
-├── smarter_json_difference.html
-│   Enhanced JSON comparison report
-│
-└── folder_comparison.xlsx
-    Example comparison output
-
----
+TBD
 
 ## Features
-
+TBD
 ### Folder Comparison
 
 Compare two folders and identify:
